@@ -1,12 +1,19 @@
 package com.example.ubiqplayer;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
-import android.view.View;
 import android.view.Menu;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -16,7 +23,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.ubiqplayer.databinding.ActivityUbiqPlayerBinding;
 
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
 public class UbiqPlayerActivity extends AppCompatActivity {
+
+    private static final int PERMISSION_REQUEST_CODE = 1111;
 
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityUbiqPlayerBinding binding;
@@ -25,6 +37,13 @@ public class UbiqPlayerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (needsPermissions())
+            return;
+
+        initComponents();
+    }
+
+    private void initComponents() {
         binding = ActivityUbiqPlayerBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -57,5 +76,32 @@ public class UbiqPlayerActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_ubiq_player);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                initComponents();
+            else
+                finish();
+        }
+    }
+
+    private boolean needsPermissions() {
+        if (!hasReadPermissions() || !hasWritePermissions()) {
+            ActivityCompat.requestPermissions(this, new String[]{WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean hasReadPermissions() {
+        return (ContextCompat.checkSelfPermission(getBaseContext(), READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+    }
+
+    private boolean hasWritePermissions() {
+        return (ContextCompat.checkSelfPermission(getBaseContext(), WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
     }
 }

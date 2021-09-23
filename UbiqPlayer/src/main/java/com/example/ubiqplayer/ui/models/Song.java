@@ -7,12 +7,14 @@ public class Song {
     private long duration;
     private String mimetype;
     private Uri uri;
+    private long size;
 
-    public Song(String title, long duration, String mimetype, Uri uri) {
+    public Song(String title, long duration, String mimetype, Uri uri, long size) {
         this.title = title;
         this.duration = duration;
         this.mimetype = mimetype;
         this.uri = uri;
+        this.size = size;
     }
 
     public String getTitle() {

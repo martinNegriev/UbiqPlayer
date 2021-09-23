@@ -2,6 +2,7 @@ package com.example.ubiqplayer.ui.repositories;
 
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.ubiqplayer.ui.mediastoreops.MediaStoreUtil;
 import com.example.ubiqplayer.ui.models.Song;
 
 import java.util.ArrayList;
@@ -26,15 +27,7 @@ public class SongRepository {
     }
 
     public void loadSongs() {
-        List<Song> songs = new ArrayList<>();
-        new Thread( () -> {
-            // TODO Query MediaStore
-            songs.clear();
-            for (int i = 0; i < 20; i++) {
-                songs.add(new Song(null, 0, null, null));
-            }
-            songsData.postValue(songs);
-        }).start();
+        new Thread(() -> songsData.postValue(MediaStoreUtil.querySongs())).start();
     }
 
     public MutableLiveData<List<Song>> getSongsData() {
