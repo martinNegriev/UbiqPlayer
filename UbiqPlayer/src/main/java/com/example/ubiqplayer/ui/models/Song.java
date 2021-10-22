@@ -4,13 +4,18 @@ import android.net.Uri;
 
 public class Song {
     private String title;
+    private String artist;
     private long duration;
     private String mimetype;
     private Uri uri;
     private long size;
+    private long albumId;
+    private String displayName;
 
-    public Song(String title, long duration, String mimetype, Uri uri, long size) {
+    public Song(String title, String displayName, String artist, long duration, String mimetype, Uri uri, long size) {
         this.title = title;
+        this.artist = artist;
+        this.displayName = displayName;
         this.duration = duration;
         this.mimetype = mimetype;
         this.uri = uri;
@@ -47,5 +52,37 @@ public class Song {
 
     public void setUri(Uri uri) {
         this.uri = uri;
+    }
+
+    public String getArtist() {
+        return artist;
+    }
+
+    public void setArtist(String artist) {
+        this.artist = artist;
+    }
+
+    public long getSize() {
+        return size;
+    }
+
+    public void setSize(long size) {
+        this.size = size;
+    }
+
+    public void setAlbumId(long albumId) {
+        this.albumId = albumId;
+    }
+
+    public long getAlbumId() {
+        return albumId;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 }

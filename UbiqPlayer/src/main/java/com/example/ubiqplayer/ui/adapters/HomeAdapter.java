@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.ubiqplayer.R;
 import com.example.ubiqplayer.ui.models.Song;
 import com.example.ubiqplayer.ui.viewholders.SongViewHolder;
+import com.example.ubiqplayer.utils.SongUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +35,12 @@ public class HomeAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        //TODO
+        SongViewHolder songHolder = (SongViewHolder) holder;
+        Song correspondingSong = songs.get(position);
+        songHolder.artistView.setText(correspondingSong.getArtist());
+        songHolder.titleView.setText(correspondingSong.getTitle());
+        songHolder.durationView.setText(SongUtils.getFormattedDuration(correspondingSong.getDuration()));
+        songHolder.loadThumbnail(correspondingSong.getUri());
     }
 
     @Override

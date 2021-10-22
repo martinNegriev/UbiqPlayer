@@ -3,7 +3,7 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
-    <color name="selectionColor">#e7dcf7</color>
-    <color name="backgroundColor">#ffffff</color>
-    <color name="focusColor">#F7f1ff</color>
+    <color name="selectionColor">#E0e0e2</color>
+    <color name="backgroundColor">#2f0464</color>
+    <color name="focusColor">#F1f1f1</color>
 </resources>

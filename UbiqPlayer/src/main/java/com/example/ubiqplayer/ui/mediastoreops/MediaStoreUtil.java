@@ -25,7 +25,10 @@ public class MediaStoreUtil {
 
         String[] projection = new String[] {
                 MediaStore.Audio.Media._ID,
+                MediaStore.Audio.Media.ALBUM_ID,
                 MediaStore.Audio.Media.DISPLAY_NAME,
+                MediaStore.Audio.AudioColumns.TITLE,
+                MediaStore.Audio.Media.ARTIST,
                 MediaStore.Audio.Media.DURATION,
                 MediaStore.Audio.Media.SIZE,
                 MediaStore.Audio.Media.MIME_TYPE
@@ -33,18 +36,26 @@ public class MediaStoreUtil {
         String sortOrder = MediaStore.Audio.Media.DATE_ADDED + " DESC";
         try(Cursor cursor = App.get().getContentResolver().query(collectionUri, projection, null, new String[]{}, sortOrder)) {
             int colIndId = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID);
+            int colAlbumId = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID);
             int colIndName = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME);
+            int colIndTitle = cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.TITLE);
+            int colArtist = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST);
             int colIndDur = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION);
             int colIndSize = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE);
             int colIndMType = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.MIME_TYPE);
             while (cursor.moveToNext()) {
                 long id = cursor.getLong(colIndId);
-                String name = cursor.getString(colIndName);
+                long albumId = cursor.getLong(colAlbumId);
+                String displayName = cursor.getString(colIndName);
                 long duration = cursor.getLong(colIndDur);
                 long size = cursor.getLong(colIndSize);
                 String mimeType = cursor.getString(colIndMType);
+                String title = cursor.getString(colIndTitle);
+                String artist = cursor.getString(colArtist);
                 Uri contentUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
-                songs.add(new Song(name, duration, mimeType, contentUri, size));
+                Song song = new Song(title, displayName, artist, duration, mimeType, contentUri, size);
+                song.setAlbumId(albumId);
+                songs.add(song);
             }
         }
 
