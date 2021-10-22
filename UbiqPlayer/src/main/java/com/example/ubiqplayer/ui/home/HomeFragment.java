@@ -30,7 +30,6 @@ public class HomeFragment extends Fragment {
 
         // Start observing
         homeViewModel.getSongsData().observe(this, songs -> homeAdapter.updateData(songs));
-        homeViewModel.loadSongsData();
     }
 
     private void initRecyclerView() {
@@ -51,4 +50,10 @@ public class HomeFragment extends Fragment {
         return root;
     }
 
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        homeViewModel.loadSongsData();
+    }
 }

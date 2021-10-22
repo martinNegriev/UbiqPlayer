@@ -2,6 +2,8 @@ package com.example.ubiqplayer.ui.adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ubiqplayer.R;
+import com.example.ubiqplayer.ui.helper.ResultTask;
 import com.example.ubiqplayer.ui.models.Song;
 import com.example.ubiqplayer.ui.viewholders.SongViewHolder;
 import com.example.ubiqplayer.utils.SongUtils;
@@ -33,6 +36,7 @@ public class HomeAdapter extends RecyclerView.Adapter {
         return new SongViewHolder(songView);
     }
 
+    @SuppressLint("StaticFieldLeak")
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         SongViewHolder songHolder = (SongViewHolder) holder;
@@ -40,7 +44,17 @@ public class HomeAdapter extends RecyclerView.Adapter {
         songHolder.artistView.setText(correspondingSong.getArtist());
         songHolder.titleView.setText(correspondingSong.getTitle());
         songHolder.durationView.setText(SongUtils.getFormattedDuration(correspondingSong.getDuration()));
-        songHolder.loadThumbnail(correspondingSong.getUri());
+        new ResultTask<Bitmap>() {
+            @Override
+            protected Bitmap doInBackground() {
+                return songHolder.loadThumbnail(correspondingSong.getUri());
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap bitmap) {
+                songHolder.setThumbnail(bitmap);
+            }
+        }.start();
     }
 
     @Override

@@ -35,7 +35,7 @@ public class SongViewHolder extends RecyclerView.ViewHolder {
         durationView = itemView.findViewById(R.id.song_duration);
     }
 
-    public void loadThumbnail(Uri uri) {
+    public Bitmap loadThumbnail(Uri uri) {
         MediaMetadataRetriever mmr = new MediaMetadataRetriever();
         byte[] rawArt;
         Bitmap art = null;
@@ -46,10 +46,16 @@ public class SongViewHolder extends RecyclerView.ViewHolder {
 
         if (rawArt != null)
             art = BitmapFactory.decodeByteArray(rawArt, 0, rawArt.length, bfo);
-        if (art != null) {
-            thumbnailView.setImageBitmap(art);
+        if (art != null)
+            return art;
+        return null;
+    }
+
+    public void setThumbnail(Bitmap bitmap) {
+        if (bitmap == null) {
+            thumbnailView.setImageResource(R.drawable.ic_audio_file);
             return;
         }
-        thumbnailView.setImageResource(R.drawable.ic_audio_file);
+        thumbnailView.setImageBitmap(bitmap);
     }
 }

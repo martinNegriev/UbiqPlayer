@@ -2,7 +2,12 @@ package com.example.ubiqplayer.utils;
 
 import android.content.res.Resources;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
 public class CommonUtils {
+
+    public static final Executor UNBOUNDED_EXECUTOR = Executors.newCachedThreadPool();
 
     public static float dpToPxFloat(float dp) {
         final float scale = Resources.getSystem().getDisplayMetrics().density;

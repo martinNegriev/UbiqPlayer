@@ -6,4 +6,6 @@
     <color name="selectionColor">#e7dcf7</color>
     <color name="backgroundColor">#ffffff</color>
     <color name="focusColor">#F7f1ff</color>
+    <color name="textColor">#000000</color>
+    <color name="navDrawerBackgroundColor">#ffffff</color>
 </resources>

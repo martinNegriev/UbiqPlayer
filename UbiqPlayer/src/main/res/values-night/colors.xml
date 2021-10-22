@@ -4,6 +4,8 @@
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
     <color name="selectionColor">#E0e0e2</color>
-    <color name="backgroundColor">#2f0464</color>
+    <color name="backgroundColor">#1a0337</color>
     <color name="focusColor">#F1f1f1</color>
+    <color name="textColor">#ffffff</color>
+    <color name="navDrawerBackgroundColor">#1e1e1e</color>
 </resources>
