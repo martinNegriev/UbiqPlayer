@@ -1,6 +1,7 @@
 package com.example.ubiqplayer.ui.viewholders;
 
 import android.content.ContentUris;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
@@ -15,12 +16,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ubiqplayer.App;
 import com.example.ubiqplayer.R;
-import com.example.ubiqplayer.utils.CommonUtils;
+import com.example.ubiqplayer.mediaplayer.MediaPlayerActivity;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
-public class SongViewHolder extends RecyclerView.ViewHolder {
+public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
     public AppCompatImageView thumbnailView;
     public TextView titleView;
@@ -57,5 +55,13 @@ public class SongViewHolder extends RecyclerView.ViewHolder {
             return;
         }
         thumbnailView.setImageBitmap(bitmap);
+    }
+
+
+    @Override
+    public void onClick(View v) {
+        Intent intent = new Intent(v.getContext(), MediaPlayerActivity.class);
+        intent.setAction(MediaPlayerActivity.MEDIA_PLAYER_ACTIVITY_ACTION);
+        v.getContext().startActivity(intent);
     }
 }

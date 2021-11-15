@@ -33,6 +33,8 @@ public class HomeAdapter extends RecyclerView.Adapter {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         final View songView = LayoutInflater.from(parent.getContext()).inflate(viewType, parent, false);
+        SongViewHolder holder = new SongViewHolder(songView);
+        songView.setOnClickListener(holder);
         return new SongViewHolder(songView);
     }
 
