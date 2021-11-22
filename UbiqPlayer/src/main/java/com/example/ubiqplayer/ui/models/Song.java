@@ -1,16 +1,21 @@
 package com.example.ubiqplayer.ui.models;
 
+import android.graphics.Bitmap;
 import android.net.Uri;
 
+import androidx.room.Entity;
+
+@Entity
 public class Song {
+    private Uri uri;
     private String title;
     private String artist;
     private long duration;
     private String mimetype;
-    private Uri uri;
     private long size;
     private long albumId;
     private String displayName;
+    private Bitmap thumb;
 
     public Song(String title, String displayName, String artist, long duration, String mimetype, Uri uri, long size) {
         this.title = title;
@@ -84,5 +89,13 @@ public class Song {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    public Bitmap getThumb() {
+        return thumb;
+    }
+
+    public void setThumb(Bitmap thumb) {
+        this.thumb = thumb;
     }
 }

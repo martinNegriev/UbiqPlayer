@@ -1,23 +1,24 @@
 package com.example.ubiqplayer.ui.home;
 
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.ubiqplayer.BaseFragment;
 import com.example.ubiqplayer.R;
 import com.example.ubiqplayer.ui.adapters.HomeAdapter;
+import com.example.ubiqplayer.ui.interfaces.ISongClickListener;
+import com.example.ubiqplayer.ui.models.Song;
 import com.example.ubiqplayer.ui.viewmodels.HomeViewModel;
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends BaseFragment implements ISongClickListener {
 
     private HomeViewModel homeViewModel;
     private RecyclerView recyclerView;
@@ -33,7 +34,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void initRecyclerView() {
-        homeAdapter = new HomeAdapter(getContext());
+        homeAdapter = new HomeAdapter(getContext(), this);
         RecyclerView.LayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setAdapter(homeAdapter);
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -55,5 +56,12 @@ public class HomeFragment extends Fragment {
     public void onResume() {
         super.onResume();
         homeViewModel.loadSongsData();
+    }
+
+    @Override
+    public void onClick(@NonNull Song playerSong) {
+        if (homeViewModel.getSongsData().getValue() == null)
+            return;
+        getUbiqPlayerActivity().startPlayback(playerSong, homeViewModel.getSongsData().getValue());
     }
 }

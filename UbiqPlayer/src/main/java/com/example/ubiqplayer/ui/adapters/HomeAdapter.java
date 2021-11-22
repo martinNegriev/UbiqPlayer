@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ubiqplayer.R;
 import com.example.ubiqplayer.ui.helper.ResultTask;
+import com.example.ubiqplayer.ui.interfaces.ISongClickListener;
 import com.example.ubiqplayer.ui.models.Song;
 import com.example.ubiqplayer.ui.viewholders.SongViewHolder;
 import com.example.ubiqplayer.utils.SongUtils;
@@ -24,18 +25,19 @@ public class HomeAdapter extends RecyclerView.Adapter {
 
     private Context context;
     private List<Song> songs = new ArrayList<>();
+    private ISongClickListener songClickListener;
 
-    public HomeAdapter(Context context) {
+    public HomeAdapter(Context context, ISongClickListener songClickListener) {
         this.context = context;
+        this.songClickListener = songClickListener;
     }
 
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         final View songView = LayoutInflater.from(parent.getContext()).inflate(viewType, parent, false);
-        SongViewHolder holder = new SongViewHolder(songView);
-        songView.setOnClickListener(holder);
-        return new SongViewHolder(songView);
+        SongViewHolder holder = new SongViewHolder(songView, songClickListener);
+        return holder;
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -46,10 +48,13 @@ public class HomeAdapter extends RecyclerView.Adapter {
         songHolder.artistView.setText(correspondingSong.getArtist());
         songHolder.titleView.setText(correspondingSong.getTitle());
         songHolder.durationView.setText(SongUtils.getFormattedDuration(correspondingSong.getDuration()));
+        songHolder.song = correspondingSong;
         new ResultTask<Bitmap>() {
             @Override
             protected Bitmap doInBackground() {
-                return songHolder.loadThumbnail(correspondingSong.getUri());
+                Bitmap b = songHolder.loadThumbnail(correspondingSong.getUri());
+                songHolder.song.setThumb(b);
+                return b;
             }
 
             @Override

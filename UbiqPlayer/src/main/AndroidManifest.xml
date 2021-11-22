@@ -5,7 +5,7 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-
+    <uses-permission-sdk-23 android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:name=".App"
@@ -26,13 +26,16 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".mediaplayer.MediaPlayerActivity"
-            android:exported="true">
+        <service android:name="com.example.ubiqplayer.mediaplayer.MediaPlayerService"
+            android:stopWithTask="false"
+            android:foregroundServiceType="mediaPlayback"/>
+
+        <receiver android:name="com.example.ubiqplayer.mediaplayer.MediaNotificationReceiver">
             <intent-filter>
-                <action android:name="MEDIA_PLAYER_ACTIVITY_ACTION" />
+                <action android:name="OPEN_PLAYER"/>
+                <action android:name="NOTIFICATION_DISMISSED"/>
             </intent-filter>
-        </activity>
+        </receiver>
     </application>
 
 </manifest>

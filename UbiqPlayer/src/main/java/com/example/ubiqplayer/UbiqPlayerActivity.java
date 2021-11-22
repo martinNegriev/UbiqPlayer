@@ -1,17 +1,16 @@
 package com.example.ubiqplayer;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 
+import com.example.ubiqplayer.mediaplayer.MediaPlayerService;
+import com.example.ubiqplayer.mediaplayer.UbiqPlayer;
+import com.example.ubiqplayer.ui.models.Song;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.navigation.NavController;
@@ -23,6 +22,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.ubiqplayer.databinding.ActivityUbiqPlayerBinding;
 
+import java.util.List;
+
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
@@ -32,6 +33,7 @@ public class UbiqPlayerActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityUbiqPlayerBinding binding;
+    private UbiqPlayer ubiqPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,4 +106,9 @@ public class UbiqPlayerActivity extends AppCompatActivity {
     private boolean hasWritePermissions() {
         return (ContextCompat.checkSelfPermission(getBaseContext(), WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
     }
+
+    public void startPlayback(@NonNull Song playedSong, @NonNull List<Song> songList) {
+        MediaPlayerService.playSong(playedSong, songList);
+    }
+
 }

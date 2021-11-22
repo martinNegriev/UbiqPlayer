@@ -1,12 +1,10 @@
 package com.example.ubiqplayer.ui.viewholders;
 
-import android.content.ContentUris;
-import android.content.Intent;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
-import android.provider.MediaStore;
 import android.view.View;
 import android.widget.TextView;
 
@@ -16,7 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ubiqplayer.App;
 import com.example.ubiqplayer.R;
-import com.example.ubiqplayer.mediaplayer.MediaPlayerActivity;
+import com.example.ubiqplayer.ui.interfaces.ISongClickListener;
+import com.example.ubiqplayer.ui.models.Song;
 
 public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
@@ -24,13 +23,17 @@ public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnCl
     public TextView titleView;
     public TextView artistView;
     public TextView durationView;
+    public Song song;
+    private ISongClickListener songClickListener;
 
-    public SongViewHolder(@NonNull View itemView) {
+    public SongViewHolder(@NonNull View itemView, ISongClickListener songClickListener) {
         super(itemView);
+        itemView.setOnClickListener(this);
         thumbnailView = itemView.findViewById(R.id.song_thumbnail);
         titleView = itemView.findViewById(R.id.song_title);
         artistView = itemView.findViewById(R.id.song_artist);
         durationView = itemView.findViewById(R.id.song_duration);
+        this.songClickListener = songClickListener;
     }
 
     public Bitmap loadThumbnail(Uri uri) {
@@ -60,8 +63,6 @@ public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnCl
 
     @Override
     public void onClick(View v) {
-        Intent intent = new Intent(v.getContext(), MediaPlayerActivity.class);
-        intent.setAction(MediaPlayerActivity.MEDIA_PLAYER_ACTIVITY_ACTION);
-        v.getContext().startActivity(intent);
+        songClickListener.onClick(song);
     }
 }
