@@ -14,6 +14,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.util.Log;
 import android.util.TypedValue;
 
 import androidx.annotation.NonNull;
@@ -30,6 +31,9 @@ import com.example.ubiqplayer.utils.CommonUtils;
 import com.example.ubiqplayer.utils.MediaPlayerUtils;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.PlaybackException;
+import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.Player.Listener;
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector;
 
 import java.util.List;
@@ -42,13 +46,49 @@ public class MediaPlayerService extends LifecycleService {
     private static boolean playWhenReady = true;
     private static MediaItem currentItem = null;
     private static long playbackPosition = 0L;
-    private static Song playedSong = null;
+    private static Song currentSong = null;
+    private static List<Song> songsQueue;
     private final IBinder musicBinder = new MusicBinder();
     private static NotificationCompat.Builder notificationBuilder;
     private static NotificationManager notificationManager;
     private static Notification notification;
     private static MediaSessionCompat mediaSession;
     private static MediaSessionConnector mediaSessionConnector;
+    private static int playbackState = ExoPlayer.STATE_IDLE;
+    private static final Listener listener = new Listener() {
+        @Override
+        public void onPlaybackStateChanged(int playbackState) {
+            MediaPlayerService.playbackState = playbackState;
+        }
+
+        @Override
+        public void onIsPlayingChanged(boolean isPlaying) {
+            boolean foreground = false;
+            if (isPlaying) {
+                foreground = true;
+                // playing
+            } else {
+                // pause, end, stop, kill, etc.
+            }
+            updateNotification(foreground, currentSong);
+        }
+
+        @Override
+        public void onPlayerError(PlaybackException error) {
+            Log.d("playerError", error.getMessage());
+        }
+
+        @Override
+        public void onMediaItemTransition(@Nullable MediaItem mediaItem, int reason) {
+            if (reason == ExoPlayer.MEDIA_ITEM_TRANSITION_REASON_REPEAT) {
+                updateNotification(true, currentSong);
+            } else if (reason == ExoPlayer.MEDIA_ITEM_TRANSITION_REASON_AUTO || reason == ExoPlayer.MEDIA_ITEM_TRANSITION_REASON_SEEK) {
+                int index = playerCore.getCurrentMediaItemIndex();
+                currentSong = songsQueue.get(index);
+                updateNotification(true, currentSong);
+            }
+        }
+    };
 
     private static final int NOTIFY_ID = 1;
 
@@ -57,6 +97,7 @@ public class MediaPlayerService extends LifecycleService {
         mediaSession = new MediaSessionCompat(App.get(), "main");
         mediaSessionConnector = new MediaSessionConnector(mediaSession);
         mediaSessionConnector.setPlayer(playerCore);
+        playerCore.addListener(listener);
     }
 
     public class MusicBinder extends Binder {
@@ -75,7 +116,7 @@ public class MediaPlayerService extends LifecycleService {
     @Override
     public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
         instance = this;
-//        updateNotification(false);
+        updateNotification(false, currentSong);
         if (notification == null) {
             startForeground(NOTIFY_ID, new Notification());
             killService();
@@ -105,7 +146,17 @@ public class MediaPlayerService extends LifecycleService {
 
     public static void playSong(@NonNull Song currentSong, @NonNull List<Song> songList) {
         MediaItem mediaItem = MediaItem.fromUri(currentSong.getUri());
-        playerCore.setMediaItem(mediaItem);
+        int currSongInd = 0;
+        for (int i = 0; i < songList.size(); i++) {
+            Song s = songList.get(i);
+            if (currentSong.getUri().equals(s.getUri()))
+                currSongInd = i;
+            playerCore.addMediaItem(MediaItem.fromUri(s.getUri()));
+        }
+        MediaPlayerService.currentSong = currentSong;
+        MediaPlayerService.currentItem = mediaItem;
+        MediaPlayerService.songsQueue = songList;
+        playerCore.seekTo(currSongInd, 0);
         playerCore.prepare();
         playerCore.play();
         updateNotification(true, currentSong);
