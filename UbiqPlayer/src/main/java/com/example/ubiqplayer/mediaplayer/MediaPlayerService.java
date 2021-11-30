@@ -32,8 +32,8 @@ import com.example.ubiqplayer.utils.MediaPlayerUtils;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackException;
-import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.Player.Listener;
+import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector;
 
 import java.util.List;
@@ -63,14 +63,11 @@ public class MediaPlayerService extends LifecycleService {
 
         @Override
         public void onIsPlayingChanged(boolean isPlaying) {
-            boolean foreground = false;
-            if (isPlaying) {
-                foreground = true;
-                // playing
-            } else {
+            if (!isPlaying) {
                 // pause, end, stop, kill, etc.
+                stopForeground();
             }
-            updateNotification(foreground, currentSong);
+            updateNotification(isPlaying, currentSong);
         }
 
         @Override
@@ -80,14 +77,18 @@ public class MediaPlayerService extends LifecycleService {
 
         @Override
         public void onMediaItemTransition(@Nullable MediaItem mediaItem, int reason) {
-            if (reason == ExoPlayer.MEDIA_ITEM_TRANSITION_REASON_REPEAT) {
-                updateNotification(true, currentSong);
-            } else if (reason == ExoPlayer.MEDIA_ITEM_TRANSITION_REASON_AUTO || reason == ExoPlayer.MEDIA_ITEM_TRANSITION_REASON_SEEK) {
-                int index = playerCore.getCurrentMediaItemIndex();
+            int index = playerCore.getCurrentMediaItemIndex();
+            if (index > -1 && songsQueue != null)
                 currentSong = songsQueue.get(index);
+            if (reason == ExoPlayer.MEDIA_ITEM_TRANSITION_REASON_REPEAT || reason == ExoPlayer.MEDIA_ITEM_TRANSITION_REASON_AUTO || reason == ExoPlayer.MEDIA_ITEM_TRANSITION_REASON_SEEK)
                 updateNotification(true, currentSong);
-            }
         }
+
+        @Override
+        public void onTimelineChanged(Timeline timeline, int reason) {
+            // If the playlist is changed, e.g. an item has been added or removed
+        }
+
     };
 
     private static final int NOTIFY_ID = 1;
@@ -159,7 +160,6 @@ public class MediaPlayerService extends LifecycleService {
         playerCore.seekTo(currSongInd, 0);
         playerCore.prepare();
         playerCore.play();
-        updateNotification(true, currentSong);
     }
 
     @SuppressLint("RestrictedApi")
@@ -248,10 +248,34 @@ public class MediaPlayerService extends LifecycleService {
         instance = null;
     }
 
-    private void pausePlayer() {
+    public static void pausePlayer() {
+        boolean isPlaying = playerCore.isPlaying();
+        if (isPlaying)
+            playerCore.pause();
+        else
+            playerCore.play();
+
         playbackPosition = playerCore.getCurrentPosition();
         currentItem = playerCore.getCurrentMediaItem();
         playWhenReady = playerCore.getPlayWhenReady();
+    }
+
+    public static void playNextPrev(boolean next) {
+        if (instance == null)
+            return;
+        if (next && playerCore.hasNextMediaItem()) {
+            playerCore.seekToNextMediaItem();
+            return;
+        }
+        if (!playerCore.hasPreviousMediaItem())
+            return;
+        playerCore.seekToPreviousMediaItem();
+    }
+
+    public static void stopForeground() {
+        if (instance == null)
+            return;
+        instance.stopForeground(false);
     }
 
     private static void releasePlayer() {

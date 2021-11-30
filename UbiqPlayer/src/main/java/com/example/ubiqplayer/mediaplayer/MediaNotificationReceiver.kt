@@ -16,6 +16,17 @@ class MediaNotificationReceiver : BroadcastReceiver() {
                 // dismiss
                 MediaPlayerService.killService()
             }
+            action == MediaPlayerActions.ACTION_PREV -> {
+                // play prev
+                MediaPlayerService.playNextPrev(false)
+            }
+            action == MediaPlayerActions.ACTION_NEXT -> {
+                // play next
+                MediaPlayerService.playNextPrev(true)
+            }
+            action == MediaPlayerActions.ACTION_PLAY_PAUSE -> {
+                MediaPlayerService.pausePlayer()
+            }
         }
     }
 }
