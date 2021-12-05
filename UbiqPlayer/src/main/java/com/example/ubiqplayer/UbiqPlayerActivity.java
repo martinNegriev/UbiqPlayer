@@ -111,4 +111,9 @@ public class UbiqPlayerActivity extends AppCompatActivity {
         MediaPlayerService.playSong(playedSong, songList);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        MediaPlayerService.releaseMediaSession();
+    }
 }

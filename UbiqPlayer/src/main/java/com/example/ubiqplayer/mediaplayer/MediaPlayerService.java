@@ -77,7 +77,10 @@ public class MediaPlayerService extends LifecycleService {
 
         @Override
         public void onMediaItemTransition(@Nullable MediaItem mediaItem, int reason) {
+            int mediaItemCount = playerCore.getMediaItemCount();
             int index = playerCore.getCurrentMediaItemIndex();
+            if (index >= mediaItemCount)
+                return;
             if (index > -1 && songsQueue != null)
                 currentSong = songsQueue.get(index);
             if (reason == ExoPlayer.MEDIA_ITEM_TRANSITION_REASON_REPEAT || reason == ExoPlayer.MEDIA_ITEM_TRANSITION_REASON_AUTO || reason == ExoPlayer.MEDIA_ITEM_TRANSITION_REASON_SEEK)
@@ -117,7 +120,6 @@ public class MediaPlayerService extends LifecycleService {
     @Override
     public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
         instance = this;
-        updateNotification(false, currentSong);
         if (notification == null) {
             startForeground(NOTIFY_ID, new Notification());
             killService();
@@ -148,6 +150,7 @@ public class MediaPlayerService extends LifecycleService {
     public static void playSong(@NonNull Song currentSong, @NonNull List<Song> songList) {
         MediaItem mediaItem = MediaItem.fromUri(currentSong.getUri());
         int currSongInd = 0;
+        playerCore.clearMediaItems();
         for (int i = 0; i < songList.size(); i++) {
             Song s = songList.get(i);
             if (currentSong.getUri().equals(s.getUri()))
@@ -279,11 +282,14 @@ public class MediaPlayerService extends LifecycleService {
     }
 
     private static void releasePlayer() {
-        if (mediaSession != null)
-            mediaSession.release();
         playbackPosition = 0;
         currentItem = null;
         playWhenReady = false;
+    }
+
+    public static void releaseMediaSession() {
+        if (mediaSession != null)
+            mediaSession.release();
     }
 
     public static MediaPlayerService getInstance() {
