@@ -14,6 +14,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import android.util.TypedValue;
 
@@ -23,6 +24,7 @@ import androidx.appcompat.widget.AppCompatDrawableManager;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleService;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.ubiqplayer.App;
 import com.example.ubiqplayer.R;
@@ -32,6 +34,7 @@ import com.example.ubiqplayer.utils.MediaPlayerUtils;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackException;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.Player.Listener;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector;
@@ -55,6 +58,8 @@ public class MediaPlayerService extends LifecycleService {
     private static MediaSessionCompat mediaSession;
     private static MediaSessionConnector mediaSessionConnector;
     private static int playbackState = ExoPlayer.STATE_IDLE;
+    private static PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder();
+
     private static final Listener listener = new Listener() {
         @Override
         public void onPlaybackStateChanged(int playbackState) {
@@ -63,10 +68,15 @@ public class MediaPlayerService extends LifecycleService {
 
         @Override
         public void onIsPlayingChanged(boolean isPlaying) {
+            refreshUI();
             if (!isPlaying) {
                 // pause, end, stop, kill, etc.
+                stateBuilder.setState(PlaybackStateCompat.STATE_PAUSED, playerCore.getCurrentPosition(), 1.0f);
+                mediaSession.setPlaybackState(stateBuilder.build());
                 stopForeground();
             }
+            stateBuilder.setState(PlaybackStateCompat.STATE_PLAYING, playerCore.getCurrentPosition(), 1.0f);
+            mediaSession.setPlaybackState(stateBuilder.build());
             updateNotification(isPlaying, currentSong);
         }
 
@@ -81,6 +91,7 @@ public class MediaPlayerService extends LifecycleService {
             int index = playerCore.getCurrentMediaItemIndex();
             if (index >= mediaItemCount)
                 return;
+            refreshUI();
             if (index > -1 && songsQueue != null)
                 currentSong = songsQueue.get(index);
             if (reason == ExoPlayer.MEDIA_ITEM_TRANSITION_REASON_REPEAT || reason == ExoPlayer.MEDIA_ITEM_TRANSITION_REASON_AUTO || reason == ExoPlayer.MEDIA_ITEM_TRANSITION_REASON_SEEK)
@@ -108,6 +119,14 @@ public class MediaPlayerService extends LifecycleService {
         public MediaPlayerService getService(){
             return MediaPlayerService.this;
         }
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        stateBuilder.setActions(PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PLAY_PAUSE | PlaybackStateCompat.ACTION_PAUSE
+                | PlaybackStateCompat.ACTION_STOP | PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS);
+        mediaSession.setPlaybackState(stateBuilder.build());
     }
 
     @Nullable
@@ -177,7 +196,7 @@ public class MediaPlayerService extends LifecycleService {
         notificationBuilder.setContentIntent(pendingIntent);
         notificationBuilder.setSmallIcon(R.drawable.ic_ubiqplayer_circle_small);
 
-        // Propeties
+        // Properties
         notificationBuilder.setOnlyAlertOnce(true);
         notificationBuilder.setColorized(true);
 
@@ -195,7 +214,7 @@ public class MediaPlayerService extends LifecycleService {
         mediaSession.setMetadata(new MediaMetadataCompat.Builder()
                 .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, song.getArtist())
                 .putString(MediaMetadataCompat.METADATA_KEY_TITLE, song.getTitle())
-                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, song.getDuration()) // remove Android 10 notification seekbar
+                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, song.getDuration())
                 .putBitmap(MediaMetadataCompat.METADATA_KEY_ART, thumb).build());
         mediaSession.setActive(true); // TODO find a place for setActive(false)
         NotificationCompat.Action prevAction = new NotificationCompat.Action.Builder(R.drawable.ic_prev, "prev", pPrevious).build();
@@ -247,11 +266,14 @@ public class MediaPlayerService extends LifecycleService {
             instance.stopForeground(true);
             instance.stopSelf();
         }
+        stateBuilder.setState(PlaybackStateCompat.STATE_STOPPED, -1, 1.0f);
+        mediaSession.setPlaybackState(stateBuilder.build());
+        hideUI();
         releasePlayer();
         instance = null;
     }
 
-    public static void pausePlayer() {
+    public static void togglePlayPausePlayer() {
         boolean isPlaying = playerCore.isPlaying();
         if (isPlaying)
             playerCore.pause();
@@ -296,4 +318,35 @@ public class MediaPlayerService extends LifecycleService {
         return instance;
     }
 
+    public static Song getCurrentSong() {
+        return currentSong;
+    }
+
+    public static long getPlaybackPosition() {
+        return playerCore.getCurrentPosition();
+    }
+
+    public static boolean isPlaying() {
+        return playerCore.isPlaying();
+    }
+
+    public static void seek(long playbackPosition) {
+        if (playbackState != Player.STATE_READY)
+            return;
+        playerCore.seekTo(playerCore.getCurrentMediaItemIndex(), playbackPosition);
+    }
+
+    public static int getState() {
+        return playbackState;
+    }
+
+    private static void hideUI() {
+        Intent intent = new Intent(MediaPlayerActions.ACTION_HIDE_UI);
+        LocalBroadcastManager.getInstance(App.get()).sendBroadcast(intent);
+    }
+
+    private static void refreshUI() {
+        Intent intent = new Intent(MediaPlayerActions.ACTION_REFRESH_UI);
+        LocalBroadcastManager.getInstance(App.get()).sendBroadcast(intent);
+    }
 }

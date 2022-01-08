@@ -1,9 +1,13 @@
 package com.example.ubiqplayer.utils;
 
+import android.content.Context;
 import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+
+import com.example.ubiqplayer.R;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -31,4 +35,13 @@ public class CommonUtils {
 
         return mutableBitmap;
     }
+
+    public static boolean isLightTheme(Context c) {
+        int[] attrs= new int[] { R.attr.isLightTheme };
+        TypedArray ta = c.obtainStyledAttributes(attrs);
+        boolean isLightTheme = ta.getBoolean(0, true);
+        ta.recycle();
+        return isLightTheme;
+    }
+
 }

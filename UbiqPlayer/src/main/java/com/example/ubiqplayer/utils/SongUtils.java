@@ -6,7 +6,7 @@ public class SongUtils {
 
     public static String getFormattedDuration(long timeMs) {
         if (timeMs <= 0)
-            return "--:--";
+            return "00:00";
         return stringForTime(timeMs);
     }
 

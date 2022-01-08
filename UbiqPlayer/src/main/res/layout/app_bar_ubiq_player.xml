@@ -27,18 +27,14 @@
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="@dimen/fab_margin"
         android:layout_marginBottom="16dp"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
+        android:visibility="gone"
+        app:tint="@android:color/white"
+        app:backgroundTint="@color/fabColor"
+        app:srcCompat="@drawable/ic_expand" />
 
     <include layout="@layout/content_ubiq_player" />
 
-    <com.google.android.exoplayer2.ui.PlayerView
-        android:id="@+id/music_player_view"
-        android:background="@color/backgroundColor"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="bottom"
-        app:controller_layout_id="@layout/music_player_layout"
-        android:visibility="gone">
-    </com.google.android.exoplayer2.ui.PlayerView>
+    <include layout="@layout/music_bottom_sheet_layout"
+        android:id="@+id/music_bottom_sheet"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

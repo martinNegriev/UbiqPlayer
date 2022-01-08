@@ -8,4 +8,6 @@
     <color name="focusColor">#F7f1ff</color>
     <color name="textColor">#000000</color>
     <color name="navDrawerBackgroundColor">#ffffff</color>
+    <color name="activeNavDrawerItemColor">#9c6eff</color>
+    <color name="fabColor">#6200EE</color>
 </resources>

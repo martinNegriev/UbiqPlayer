@@ -18,6 +18,8 @@ import com.example.ubiqplayer.ui.interfaces.ISongClickListener;
 import com.example.ubiqplayer.ui.models.Song;
 import com.example.ubiqplayer.ui.viewmodels.HomeViewModel;
 
+import java.util.List;
+
 public class HomeFragment extends BaseFragment implements ISongClickListener {
 
     private HomeViewModel homeViewModel;
@@ -60,8 +62,9 @@ public class HomeFragment extends BaseFragment implements ISongClickListener {
 
     @Override
     public void onClick(@NonNull Song playerSong) {
-        if (homeViewModel.getSongsData().getValue() == null)
+        List<Song> songs = homeViewModel.getSongsData().getValue();
+        if (songs == null)
             return;
-        getUbiqPlayerActivity().startPlayback(playerSong, homeViewModel.getSongsData().getValue());
+        getUbiqPlayerActivity().startPlayback(playerSong, songs);
     }
 }

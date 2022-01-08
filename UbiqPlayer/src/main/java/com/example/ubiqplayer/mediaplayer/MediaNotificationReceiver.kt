@@ -25,7 +25,7 @@ class MediaNotificationReceiver : BroadcastReceiver() {
                 MediaPlayerService.playNextPrev(true)
             }
             action == MediaPlayerActions.ACTION_PLAY_PAUSE -> {
-                MediaPlayerService.pausePlayer()
+                MediaPlayerService.togglePlayPausePlayer()
             }
         }
     }

@@ -4,6 +4,7 @@ class MediaPlayerActions {
 
     companion object {
 
+        // Notification actions
         @JvmField
         val ACTION_OPEN_PLAYER = "OPEN_PLAYER"
 
@@ -18,5 +19,12 @@ class MediaPlayerActions {
 
         @JvmField
         val ACTION_PREV = "PREV"
+
+        // Player view actions
+        @JvmField
+        val ACTION_HIDE_UI = "HIDE_UI"
+
+        @JvmField
+        val ACTION_REFRESH_UI = "REFRESH_UI"
     }
 }

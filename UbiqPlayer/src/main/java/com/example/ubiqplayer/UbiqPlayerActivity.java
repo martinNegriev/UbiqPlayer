@@ -3,11 +3,14 @@ package com.example.ubiqplayer;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.View;
+import android.widget.LinearLayout;
 
 import com.example.ubiqplayer.mediaplayer.MediaPlayerService;
-import com.example.ubiqplayer.mediaplayer.UbiqPlayer;
+import com.example.ubiqplayer.mediaplayer.UbiqPlayerLogic;
+import com.example.ubiqplayer.ui.customviews.MusicBottomSheet;
 import com.example.ubiqplayer.ui.models.Song;
-import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
@@ -33,7 +36,8 @@ public class UbiqPlayerActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityUbiqPlayerBinding binding;
-    private UbiqPlayer ubiqPlayer;
+    private MusicBottomSheet musicBottomSheet;
+    private UbiqPlayerLogic playerLogic;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +54,17 @@ public class UbiqPlayerActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         setSupportActionBar(binding.appBarUbiqPlayer.toolbar);
-        binding.appBarUbiqPlayer.fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show());
+
+        musicBottomSheet = getMusicBottomSheet();
+
+        if (MediaPlayerService.isPlaying()) { // If theme is changed
+            binding.appBarUbiqPlayer.fab.setVisibility(View.VISIBLE);
+            musicBottomSheet.refreshUI();
+        }
+        binding.appBarUbiqPlayer.fab.setOnClickListener(view -> musicBottomSheet.toggleBottomSheet());
+
+        playerLogic = new UbiqPlayerLogic(UbiqPlayerActivity.this);
+        playerLogic.tryRegisterReceiver();
 
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
@@ -108,12 +121,27 @@ public class UbiqPlayerActivity extends AppCompatActivity {
     }
 
     public void startPlayback(@NonNull Song playedSong, @NonNull List<Song> songList) {
+        binding.appBarUbiqPlayer.fab.setVisibility(View.VISIBLE);
         MediaPlayerService.playSong(playedSong, songList);
+    }
+
+    @NonNull
+    public MusicBottomSheet getMusicBottomSheet() {
+        if (musicBottomSheet == null) {
+            LinearLayout bottomSheet = binding.appBarUbiqPlayer.musicBottomSheet.bottomSheetContent;
+            BottomSheetBehavior<LinearLayout> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+            musicBottomSheet = new MusicBottomSheet(bottomSheet, bottomSheetBehavior);
+        }
+        return musicBottomSheet;
+    }
+
+    public View getFAB() {
+        return binding.appBarUbiqPlayer.fab;
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        MediaPlayerService.releaseMediaSession();
+        playerLogic.tryUnregisterReceiver();
     }
 }
