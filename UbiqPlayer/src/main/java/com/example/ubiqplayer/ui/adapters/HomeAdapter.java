@@ -3,7 +3,6 @@ package com.example.ubiqplayer.ui.adapters;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,16 +11,18 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ubiqplayer.R;
+import com.example.ubiqplayer.mediaplayer.MediaPlayerService;
 import com.example.ubiqplayer.ui.helper.ResultTask;
 import com.example.ubiqplayer.ui.interfaces.ISongClickListener;
 import com.example.ubiqplayer.ui.models.Song;
 import com.example.ubiqplayer.ui.viewholders.SongViewHolder;
 import com.example.ubiqplayer.utils.SongUtils;
+import com.google.android.exoplayer2.Player;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeAdapter extends RecyclerView.Adapter {
+public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private Context context;
     private List<Song> songs = new ArrayList<>();
@@ -43,12 +44,22 @@ public class HomeAdapter extends RecyclerView.Adapter {
     @SuppressLint("StaticFieldLeak")
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        Context ctx = holder.itemView.getContext();
         SongViewHolder songHolder = (SongViewHolder) holder;
         Song correspondingSong = songs.get(position);
         songHolder.artistView.setText(correspondingSong.getArtist());
         songHolder.titleView.setText(correspondingSong.getTitle());
         songHolder.durationView.setText(SongUtils.getFormattedDuration(correspondingSong.getDuration()));
         songHolder.song = correspondingSong;
+        if (MediaPlayerService.getState() != Player.STATE_IDLE && correspondingSong.getUri().equals(MediaPlayerService.getCurrentSong().getUri())) {
+            songHolder.artistView.setTextColor(ctx.getResources().getColor(R.color.colorAccent, ctx.getTheme()));
+            songHolder.titleView.setTextColor(ctx.getResources().getColor(R.color.colorAccent, ctx.getTheme()));
+            songHolder.durationView.setTextColor(ctx.getResources().getColor(R.color.colorAccent, ctx.getTheme()));
+        } else {
+            songHolder.artistView.setTextColor(ctx.getResources().getColor(R.color.textColor, ctx.getTheme()));
+            songHolder.titleView.setTextColor(ctx.getResources().getColor(R.color.textColor, ctx.getTheme()));
+            songHolder.durationView.setTextColor(ctx.getResources().getColor(R.color.textColor, ctx.getTheme()));
+        }
         new ResultTask<Bitmap>() {
             @Override
             protected Bitmap doInBackground() {

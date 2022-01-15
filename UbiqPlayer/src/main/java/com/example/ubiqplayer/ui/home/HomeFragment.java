@@ -61,10 +61,16 @@ public class HomeFragment extends BaseFragment implements ISongClickListener {
     }
 
     @Override
+    protected RecyclerView.Adapter getAdapter() {
+        return homeAdapter;
+    }
+
+    @Override
     public void onClick(@NonNull Song playerSong) {
         List<Song> songs = homeViewModel.getSongsData().getValue();
         if (songs == null)
             return;
         getUbiqPlayerActivity().startPlayback(playerSong, songs);
+        notifyAdapterDataSetChanged();
     }
 }
