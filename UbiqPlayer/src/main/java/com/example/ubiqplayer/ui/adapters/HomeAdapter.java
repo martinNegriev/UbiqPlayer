@@ -3,6 +3,7 @@ package com.example.ubiqplayer.ui.adapters;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,18 +28,29 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private Context context;
     private List<Song> songs = new ArrayList<>();
     private ISongClickListener songClickListener;
+    private static final LruCache<String, Bitmap> memoryCache;
+
+    static {
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+        memoryCache = new LruCache<String, Bitmap>(maxMemory / 8) {
+            @Override
+            protected int sizeOf(String key, Bitmap bitmap) {
+                return bitmap.getByteCount() / 1024;
+            }
+        };
+    }
 
     public HomeAdapter(Context context, ISongClickListener songClickListener) {
         this.context = context;
         this.songClickListener = songClickListener;
+        setHasStableIds(true);
     }
 
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         final View songView = LayoutInflater.from(parent.getContext()).inflate(viewType, parent, false);
-        SongViewHolder holder = new SongViewHolder(songView, songClickListener);
-        return holder;
+        return new SongViewHolder(songView, songClickListener);
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -60,19 +72,7 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             songHolder.titleView.setTextColor(ctx.getResources().getColor(R.color.textColor, ctx.getTheme()));
             songHolder.durationView.setTextColor(ctx.getResources().getColor(R.color.textColor, ctx.getTheme()));
         }
-        new ResultTask<Bitmap>() {
-            @Override
-            protected Bitmap doInBackground() {
-                Bitmap b = songHolder.loadThumbnail(correspondingSong.getUri());
-                songHolder.song.setThumb(b);
-                return b;
-            }
-
-            @Override
-            protected void onPostExecute(Bitmap bitmap) {
-                songHolder.setThumbnail(bitmap);
-            }
-        }.start();
+        processBitmap(songHolder);
     }
 
     @Override
@@ -89,5 +89,44 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public void updateData(List<Song> songs) {
         this.songs = songs;
         notifyDataSetChanged();
+    }
+
+    private void processBitmap(SongViewHolder songHolder) {
+        Bitmap cached = getBitmapFromMemCache(songHolder.song.getUri().toString());
+        if (cached != null) {
+            songHolder.setThumbnail(cached);
+            return;
+        }
+        songHolder.setThumbnail(null);
+        new ResultTask<Bitmap>() {
+            @Override
+            protected Bitmap doInBackground() {
+                Bitmap b = songHolder.loadThumbnail(songHolder.song.getUri());
+                if (b != null)
+                    addBitmapToMemoryCache(songHolder.song.getUri().toString(), b);
+
+                return b;
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap bitmap) {
+                songHolder.setThumbnail(bitmap);
+            }
+        }.start();
+    }
+
+    public static void addBitmapToMemoryCache(String key, Bitmap bitmap) {
+        if (getBitmapFromMemCache(key) == null) {
+            memoryCache.put(key, bitmap);
+        }
+    }
+
+    public static Bitmap getBitmapFromMemCache(String key) {
+        return memoryCache.get(key);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return songs.get(position).hashCode();
     }
 }

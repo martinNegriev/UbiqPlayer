@@ -15,7 +15,6 @@ public class Song {
     private long size;
     private long albumId;
     private String displayName;
-    private Bitmap thumb;
 
     public Song(String title, String displayName, String artist, long duration, String mimetype, Uri uri, long size) {
         this.title = title;
@@ -89,13 +88,5 @@ public class Song {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
-    }
-
-    public Bitmap getThumb() {
-        return thumb;
-    }
-
-    public void setThumb(Bitmap thumb) {
-        this.thumb = thumb;
     }
 }

@@ -1,6 +1,7 @@
 package com.example.ubiqplayer.ui.home;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +14,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ubiqplayer.BaseFragment;
 import com.example.ubiqplayer.R;
+import com.example.ubiqplayer.mediaplayer.lyricsfinder.LyricsFinder;
 import com.example.ubiqplayer.ui.adapters.HomeAdapter;
 import com.example.ubiqplayer.ui.interfaces.ISongClickListener;
 import com.example.ubiqplayer.ui.models.Song;
 import com.example.ubiqplayer.ui.viewmodels.HomeViewModel;
+import com.example.ubiqplayer.utils.CommonUtils;
 
 import java.util.List;
 
@@ -71,6 +74,5 @@ public class HomeFragment extends BaseFragment implements ISongClickListener {
         if (songs == null)
             return;
         getUbiqPlayerActivity().startPlayback(playerSong, songs);
-        notifyAdapterDataSetChanged();
     }
 }

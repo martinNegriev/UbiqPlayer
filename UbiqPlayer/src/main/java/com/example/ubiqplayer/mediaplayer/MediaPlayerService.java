@@ -28,6 +28,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.ubiqplayer.App;
 import com.example.ubiqplayer.R;
+import com.example.ubiqplayer.ui.adapters.HomeAdapter;
 import com.example.ubiqplayer.ui.models.Song;
 import com.example.ubiqplayer.utils.CommonUtils;
 import com.example.ubiqplayer.utils.MediaPlayerUtils;
@@ -210,7 +211,7 @@ public class MediaPlayerService extends LifecycleService {
         PendingIntent pPrevious = PendingIntent.getBroadcast(App.get(), 0, prev, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         PendingIntent pNext = PendingIntent.getBroadcast(App.get(), 0, next, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         PendingIntent pPlay = PendingIntent.getBroadcast(App.get(), 0, play, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        Bitmap thumb = song.getThumb();
+        Bitmap thumb = HomeAdapter.getBitmapFromMemCache(song.getUri().toString());
         mediaSession.setMetadata(new MediaMetadataCompat.Builder()
                 .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, song.getArtist())
                 .putString(MediaMetadataCompat.METADATA_KEY_TITLE, song.getTitle())

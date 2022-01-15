@@ -1,5 +1,7 @@
 package com.example.ubiqplayer.ui.customviews;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -7,9 +9,12 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,11 +24,21 @@ import com.example.ubiqplayer.App;
 import com.example.ubiqplayer.R;
 import com.example.ubiqplayer.databinding.MusicBottomSheetLayoutBinding;
 import com.example.ubiqplayer.mediaplayer.MediaPlayerService;
+import com.example.ubiqplayer.mediaplayer.lyricsfinder.LyricsFinder;
+import com.example.ubiqplayer.mediaplayer.lyricsfinder.LyricsFinderKt;
+import com.example.ubiqplayer.ui.adapters.HomeAdapter;
+import com.example.ubiqplayer.ui.helper.ResultTask;
 import com.example.ubiqplayer.ui.models.Song;
+import com.example.ubiqplayer.utils.CommonUtils;
 import com.example.ubiqplayer.utils.SongUtils;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Player;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.example.ubiqplayer.mediaplayer.lyricsfinder.LyricsFinder.MIN_LENGTH_LYRICS;
 
 public class MusicBottomSheet {
 
@@ -118,6 +133,99 @@ public class MusicBottomSheet {
 
         initShuffleMode(false);
         binding.playerShuffle.setOnClickListener(v -> initShuffleMode(true));
+
+        initLyricsMode();
+        binding.playerLyricsButton.setOnClickListener(v -> {
+            if (MediaPlayerService.getState() == Player.STATE_IDLE)
+                return;
+            View playerThumb = binding.playerThumb;
+            if (playerThumb.getVisibility() == View.GONE) {
+                binding.playerLyricsView.setVisibility(View.GONE);
+                playerThumb.setVisibility(View.VISIBLE);
+                playerThumb.animate()
+                        .alpha(1.0f)
+                        .setDuration(600)
+                        .setListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                super.onAnimationEnd(animation);
+                                initLyricsMode();
+                            }
+                        });
+                return;
+            }
+            new ResultTask<List<String>>() {
+
+                @Override
+                protected List<String> doInBackground() {
+                    Song currentSong = MediaPlayerService.getCurrentSong();
+                    if (currentSong == null)
+                        return null;
+                    String artist = currentSong.getArtist();
+                    String title = currentSong.getTitle();
+                    String query;
+                    if (!TextUtils.isEmpty(artist) && !TextUtils.isEmpty(title))
+                        query = artist + " " + title;
+                    else if (!TextUtils.isEmpty(title))
+                        query = title;
+                    else {
+                        return null;
+                    }
+                    List<String> urls;
+                    try {
+                        urls = LyricsFinder.INSTANCE.find(query + " song lyrics");
+                        if (urls == null || urls.isEmpty()) {
+                            Toast.makeText(App.get(), R.string.toast_msg_no_lyrics_found, Toast.LENGTH_LONG).show();
+                            return null;
+                        }
+                    } catch (Exception e) {
+                        Toast.makeText(App.get(), R.string.toast_msg_no_lyrics_found, Toast.LENGTH_LONG).show();
+                        return null;
+                    }
+                    List<String> lyricsList = new ArrayList<>();
+                    for (String url : urls) {
+                        String lyrics;
+                        try {
+                            lyrics = LyricsFinder.INSTANCE.findLyrics(url);
+                        } catch (Exception e) {
+                            continue;
+                        }
+                        if (lyrics != null && lyrics.length() > MIN_LENGTH_LYRICS)
+                            lyricsList.add(lyrics);
+                    }
+                    return lyricsList;
+                }
+
+                @Override
+                protected void onPostExecute(List<String> lyrics) {
+                    // TODO Cache already loaded lyrics, implement next lyrics button
+                    if (lyrics == null || lyrics.isEmpty()) {
+                        Toast.makeText(App.get(), R.string.toast_msg_no_lyrics_found, Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    String firstLyrics = lyrics.get(0);
+                    showLyricsView(firstLyrics);
+                }
+            }.start();
+        });
+    }
+
+    private void showLyricsView(String lyrics) {
+        View playerThumb = binding.playerThumb;
+        playerThumb.animate()
+                .alpha(0.0f)
+                .setDuration(600)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        playerThumb.setVisibility(View.GONE);
+                        binding.playerLyricsView.setText(lyrics);
+                        binding.playerLyricsView.setMovementMethod(new ScrollingMovementMethod());
+                        binding.playerLyricsView.setVisibility(View.VISIBLE);
+                        initLyricsMode();
+                    }
+                });
     }
 
     public void toggleBottomSheet() {
@@ -144,9 +252,9 @@ public class MusicBottomSheet {
         binding.playerCurrentPos.setText(SongUtils.getFormattedDuration(MediaPlayerService.getPlaybackPosition()));
         initShuffleMode(false);
         initRepeatMode(false);
-        Bitmap thumb = playingSong.getThumb();
+        Bitmap thumb = HomeAdapter.getBitmapFromMemCache(playingSong.getUri().toString());
         if (thumb != null)
-            binding.playerThumb.setImageBitmap(playingSong.getThumb());
+            binding.playerThumb.setImageBitmap(thumb);
         else
             binding.playerThumb.setImageDrawable(AppCompatDrawableManager.get().getDrawable(App.get(), R.drawable.ic_audio_file));
         updatePlayPause();
@@ -214,6 +322,18 @@ public class MusicBottomSheet {
             return;
         }
         binding.playerShuffle.setColorFilter(ctx.getResources().getColor(R.color.iconInactiveColor, ctx.getTheme()), PorterDuff.Mode.SRC_IN);
+    }
+
+    private void initLyricsMode() {
+        if (MediaPlayerService.getState() == ExoPlayer.STATE_IDLE)
+            return;
+        Context ctx = binding.playerLyricsButton.getContext();
+        boolean isLyricsModeEnabled = binding.playerThumb.getVisibility() == View.GONE;
+        if (isLyricsModeEnabled) {
+            binding.playerLyricsButton.setColorFilter(ctx.getResources().getColor(R.color.colorAccent, ctx.getTheme()), PorterDuff.Mode.SRC_IN);
+            return;
+        }
+        binding.playerLyricsButton.setColorFilter(ctx.getResources().getColor(R.color.iconInactiveColor, ctx.getTheme()), PorterDuff.Mode.SRC_IN);
     }
 
 }
