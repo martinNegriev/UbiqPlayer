@@ -20,9 +20,9 @@ import com.example.ubiqplayer.R;
 import com.example.ubiqplayer.databinding.MusicBottomSheetLayoutBinding;
 import com.example.ubiqplayer.mediaplayer.MediaPlayerService;
 import com.example.ubiqplayer.ui.models.Song;
-import com.example.ubiqplayer.utils.CommonUtils;
 import com.example.ubiqplayer.utils.SongUtils;
 import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.Player;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 public class MusicBottomSheet {
@@ -75,23 +75,7 @@ public class MusicBottomSheet {
             }
         });
 
-        binding.playerPlayPause.setOnClickListener(v -> {
-            if (MediaPlayerService.getState() == ExoPlayer.STATE_IDLE)
-                return;
-            MediaPlayerService.togglePlayPausePlayer();
-        });
-
-        binding.playerNext.setOnClickListener(v -> {
-            if (MediaPlayerService.getState() == ExoPlayer.STATE_IDLE)
-                return;
-            MediaPlayerService.playNextPrev(true);
-        });
-
-        binding.playerPrev.setOnClickListener(v -> {
-            if (MediaPlayerService.getState() == ExoPlayer.STATE_IDLE)
-                return;
-            MediaPlayerService.playNextPrev(false);
-        });
+        initClickListeners();
     }
 
     @SuppressLint("HandlerLeak")
@@ -109,6 +93,32 @@ public class MusicBottomSheet {
         }
 
     };
+
+    private void initClickListeners() {
+        binding.playerPlayPause.setOnClickListener(v -> {
+            if (MediaPlayerService.getState() == ExoPlayer.STATE_IDLE)
+                return;
+            MediaPlayerService.togglePlayPausePlayer();
+        });
+
+        binding.playerNext.setOnClickListener(v -> {
+            if (MediaPlayerService.getState() == ExoPlayer.STATE_IDLE)
+                return;
+            MediaPlayerService.playNextPrev(true);
+        });
+
+        binding.playerPrev.setOnClickListener(v -> {
+            if (MediaPlayerService.getState() == ExoPlayer.STATE_IDLE)
+                return;
+            MediaPlayerService.playNextPrev(false);
+        });
+
+        initRepeatMode(false);
+        binding.playerRepeat.setOnClickListener(v -> initRepeatMode(true));
+
+        initShuffleMode(false);
+        binding.playerShuffle.setOnClickListener(v -> initShuffleMode(true));
+    }
 
     public void toggleBottomSheet() {
         int state = bottomSheetBehavior.getState();
@@ -132,6 +142,8 @@ public class MusicBottomSheet {
         binding.playerTitle.setText(playingSong.getTitle());
         binding.playerDuration.setText(SongUtils.getFormattedDuration(playingSong.getDuration()));
         binding.playerCurrentPos.setText(SongUtils.getFormattedDuration(MediaPlayerService.getPlaybackPosition()));
+        initShuffleMode(false);
+        initRepeatMode(false);
         Bitmap thumb = playingSong.getThumb();
         if (thumb != null)
             binding.playerThumb.setImageBitmap(playingSong.getThumb());
@@ -167,6 +179,41 @@ public class MusicBottomSheet {
             binding.playerDuration.setText("00:00");
         binding.playerCurrentPos.setText(SongUtils.getFormattedDuration(curPlayerPos));
         return curPlayerPos;
+    }
+
+    private void initRepeatMode(boolean toggle) {
+        if (MediaPlayerService.getState() == ExoPlayer.STATE_IDLE)
+            return;
+        int repeatMode = MediaPlayerService.toggleAndGetRepeatMode(toggle);
+        Context ctx = binding.playerRepeat.getContext();
+        switch (repeatMode) {
+            case Player.REPEAT_MODE_OFF: {
+                binding.repeatOne.setVisibility(View.INVISIBLE);
+                binding.playerRepeat.setColorFilter(ctx.getResources().getColor(R.color.iconInactiveColor, ctx.getTheme()), PorterDuff.Mode.SRC_IN);
+                break;
+            }
+            case Player.REPEAT_MODE_ONE: {
+                binding.repeatOne.setVisibility(View.VISIBLE);
+                binding.playerRepeat.setColorFilter(ctx.getResources().getColor(R.color.colorAccent, ctx.getTheme()), PorterDuff.Mode.SRC_IN);
+                break;
+            }
+            case Player.REPEAT_MODE_ALL: {
+                binding.repeatOne.setVisibility(View.INVISIBLE);
+                binding.playerRepeat.setColorFilter(ctx.getResources().getColor(R.color.colorAccent, ctx.getTheme()), PorterDuff.Mode.SRC_IN);
+            }
+        }
+    }
+
+    private void initShuffleMode(boolean toggle) {
+        if (MediaPlayerService.getState() == ExoPlayer.STATE_IDLE)
+            return;
+        Context ctx = binding.playerShuffle.getContext();
+        boolean isShuffleModeEnabled = MediaPlayerService.toggleAndGetShuffleMode(toggle);
+        if (isShuffleModeEnabled) {
+            binding.playerShuffle.setColorFilter(ctx.getResources().getColor(R.color.colorAccent, ctx.getTheme()), PorterDuff.Mode.SRC_IN);
+            return;
+        }
+        binding.playerShuffle.setColorFilter(ctx.getResources().getColor(R.color.iconInactiveColor, ctx.getTheme()), PorterDuff.Mode.SRC_IN);
     }
 
 }

@@ -297,6 +297,34 @@ public class MediaPlayerService extends LifecycleService {
         playerCore.seekToPreviousMediaItem();
     }
 
+
+    public static int toggleAndGetRepeatMode(boolean toggle) {
+        if (playerCore.getRepeatMode() == Player.REPEAT_MODE_OFF) {
+            if (toggle)
+                playerCore.setRepeatMode(Player.REPEAT_MODE_ONE);
+            return playerCore.getRepeatMode();
+        }
+        if (playerCore.getRepeatMode() == Player.REPEAT_MODE_ONE) {
+            if (toggle)
+                playerCore.setRepeatMode(Player.REPEAT_MODE_ALL);
+            return playerCore.getRepeatMode();
+        }
+        if (toggle)
+            playerCore.setRepeatMode(Player.REPEAT_MODE_OFF);
+        return playerCore.getRepeatMode();
+    }
+
+    public static boolean toggleAndGetShuffleMode(boolean toggle) {
+        if (!playerCore.getShuffleModeEnabled()) {
+            if (toggle)
+                playerCore.setShuffleModeEnabled(true);
+            return playerCore.getShuffleModeEnabled();
+        }
+        if (toggle)
+            playerCore.setShuffleModeEnabled(false);
+        return playerCore.getShuffleModeEnabled();
+    }
+
     public static void stopForeground() {
         if (instance == null)
             return;

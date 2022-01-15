@@ -144,9 +144,11 @@
                 android:layout_weight="1">
 
                 <TextView
+                    android:id="@+id/repeat_one"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="10sp"
+                    android:textColor="@color/colorAccent"
                     android:layout_centerInParent="true"
                     android:text="1">
                 </TextView>
