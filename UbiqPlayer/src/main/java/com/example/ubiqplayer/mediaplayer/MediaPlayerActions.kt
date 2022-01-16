@@ -26,5 +26,8 @@ class MediaPlayerActions {
 
         @JvmField
         val ACTION_REFRESH_UI = "REFRESH_UI"
+
+        @JvmField
+        val ACTION_REFRESH_UI_ITEM_TRANSITION = "REFRESH_UI_ITEM_TRANSITION"
     }
 }

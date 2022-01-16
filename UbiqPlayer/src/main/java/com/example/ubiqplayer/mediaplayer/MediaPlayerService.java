@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.v4.media.MediaMetadataCompat;
@@ -40,7 +41,9 @@ import com.google.android.exoplayer2.Player.Listener;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class MediaPlayerService extends LifecycleService {
 
@@ -60,6 +63,7 @@ public class MediaPlayerService extends LifecycleService {
     private static MediaSessionConnector mediaSessionConnector;
     private static int playbackState = ExoPlayer.STATE_IDLE;
     private static PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder();
+    private static Map<Uri, List<String>> currentSongLyricsList = null;
 
     private static final Listener listener = new Listener() {
         @Override
@@ -69,7 +73,7 @@ public class MediaPlayerService extends LifecycleService {
 
         @Override
         public void onIsPlayingChanged(boolean isPlaying) {
-            refreshUI();
+            refreshUI(false);
             if (!isPlaying) {
                 // pause, end, stop, kill, etc.
                 stateBuilder.setState(PlaybackStateCompat.STATE_PAUSED, playerCore.getCurrentPosition(), 1.0f);
@@ -92,7 +96,7 @@ public class MediaPlayerService extends LifecycleService {
             int index = playerCore.getCurrentMediaItemIndex();
             if (index >= mediaItemCount)
                 return;
-            refreshUI();
+            refreshUI(true);
             if (index > -1 && songsQueue != null)
                 currentSong = songsQueue.get(index);
             if (reason == ExoPlayer.MEDIA_ITEM_TRANSITION_REASON_REPEAT || reason == ExoPlayer.MEDIA_ITEM_TRANSITION_REASON_AUTO || reason == ExoPlayer.MEDIA_ITEM_TRANSITION_REASON_SEEK)
@@ -374,8 +378,22 @@ public class MediaPlayerService extends LifecycleService {
         LocalBroadcastManager.getInstance(App.get()).sendBroadcast(intent);
     }
 
-    private static void refreshUI() {
-        Intent intent = new Intent(MediaPlayerActions.ACTION_REFRESH_UI);
+    private static void refreshUI(boolean itemTransition) {
+        String action = itemTransition ? MediaPlayerActions.ACTION_REFRESH_UI_ITEM_TRANSITION : MediaPlayerActions.ACTION_REFRESH_UI;
+        Intent intent = new Intent(action);
         LocalBroadcastManager.getInstance(App.get()).sendBroadcast(intent);
+    }
+
+    public static void setCurrentSongLyricsList(@Nullable List<String> lyricsList) {
+        if (lyricsList == null) {
+            currentSongLyricsList = null;
+            return;
+        }
+        currentSongLyricsList = Collections.singletonMap(getCurrentSong().getUri(), lyricsList);
+    }
+
+    @Nullable
+    public static Map<Uri, List<String>> getCurrentSongLyricsList() {
+        return currentSongLyricsList;
     }
 }

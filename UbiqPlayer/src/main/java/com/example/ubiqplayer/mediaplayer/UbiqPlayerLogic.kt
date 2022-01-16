@@ -19,6 +19,7 @@ class UbiqPlayerLogic(val act: UbiqPlayerActivity) {
         val intentFilter = IntentFilter()
         intentFilter.addAction(MediaPlayerActions.ACTION_HIDE_UI)
         intentFilter.addAction(MediaPlayerActions.ACTION_REFRESH_UI)
+        intentFilter.addAction(MediaPlayerActions.ACTION_REFRESH_UI_ITEM_TRANSITION)
         LocalBroadcastManager.getInstance(act).registerReceiver(receiver, intentFilter)
         registered = true
     }
@@ -32,7 +33,7 @@ class UbiqPlayerLogic(val act: UbiqPlayerActivity) {
         override fun onReceive(context: Context, intent: Intent) {
             val action = intent.action
             when {
-                action == MediaPlayerActions.ACTION_REFRESH_UI -> {
+                action == MediaPlayerActions.ACTION_REFRESH_UI || action == MediaPlayerActions.ACTION_REFRESH_UI_ITEM_TRANSITION -> {
                     var frag = act.supportFragmentManager.fragments.last()
                     var navFrag = act.supportFragmentManager.primaryNavigationFragment
                     if (frag.equals(navFrag) && frag is UbiqPlayerNavHostFragment) {
@@ -46,11 +47,14 @@ class UbiqPlayerLogic(val act: UbiqPlayerActivity) {
                     if (frag is BaseFragment)
                         frag.notifyAdapterDataSetChanged()
                     act.musicBottomSheet.refreshUI()
+                    if (action == MediaPlayerActions.ACTION_REFRESH_UI_ITEM_TRANSITION)
+                        act.musicBottomSheet.hideLyricsView()
                 }
 
                 action == MediaPlayerActions.ACTION_HIDE_UI -> {
                     act.fab.visibility = View.GONE
                     act.musicBottomSheet.hideBottomSheet()
+                    act.musicBottomSheet.hideLyricsView()
                 }
                 else -> assert(false)
             }
