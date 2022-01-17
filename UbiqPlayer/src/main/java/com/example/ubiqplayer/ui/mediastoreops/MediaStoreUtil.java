@@ -8,6 +8,7 @@ import android.os.Build;
 import android.provider.MediaStore;
 
 import com.example.ubiqplayer.App;
+import com.example.ubiqplayer.persistence.SongDatabase;
 import com.example.ubiqplayer.ui.models.Song;
 
 import java.util.ArrayList;
@@ -58,6 +59,7 @@ public class MediaStoreUtil {
                 songs.add(song);
             }
         }
+        SongDatabase.getInstance().songDao().upsert(songs);
 
         return songs;
     }

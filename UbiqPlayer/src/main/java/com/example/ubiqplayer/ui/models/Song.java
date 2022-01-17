@@ -2,20 +2,41 @@ package com.example.ubiqplayer.ui.models;
 
 import android.net.Uri;
 
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 @Entity
 public class Song {
-    private Uri songUri;
+    @PrimaryKey
+    private @NonNull Uri songUri;
+
+    @ColumnInfo(name = "title")
     private String title;
+
+    @ColumnInfo(name = "artist")
     private String artist;
+
+    @ColumnInfo(name = "duration")
     private long duration;
+
+    @ColumnInfo(name = "mimetype")
     private String mimetype;
+
+    @ColumnInfo(name = "size")
     private long size;
+
+    @ColumnInfo(name = "albumId")
     private long albumId;
+
+    @ColumnInfo(name = "displayName")
     private String displayName;
 
-    public Song(String title, String displayName, String artist, long duration, String mimetype, Uri songUri, long size) {
+    @ColumnInfo(name = "lyrics")
+    private String lyrics;
+
+    public Song(String title, String displayName, String artist, long duration, String mimetype, @NonNull Uri songUri, long size) {
         this.title = title;
         this.artist = artist;
         this.displayName = displayName;
@@ -87,5 +108,13 @@ public class Song {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    public String getLyrics() {
+        return lyrics;
+    }
+
+    public void setLyrics(String lyrics) {
+        this.lyrics = lyrics;
     }
 }
