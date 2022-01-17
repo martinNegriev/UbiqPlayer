@@ -1,6 +1,5 @@
 package com.example.ubiqplayer.ui.mediastoreops;
 
-import android.app.Activity;
 import android.content.ContentUris;
 import android.database.Cursor;
 import android.net.Uri;
@@ -12,12 +11,14 @@ import com.example.ubiqplayer.persistence.SongDatabase;
 import com.example.ubiqplayer.ui.models.Song;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MediaStoreUtil {
 
     public static List<Song> querySongs() {
-        List<Song> songs = new ArrayList<>();
+        Map<Uri, Song> songs = new LinkedHashMap<>();
         Uri collectionUri;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
             collectionUri = MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL);
@@ -56,11 +57,27 @@ public class MediaStoreUtil {
                 Uri contentUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
                 Song song = new Song(title, displayName, artist, duration, mimeType, contentUri, size);
                 song.setAlbumId(albumId);
-                songs.add(song);
+                songs.put(contentUri, song);
             }
         }
-        SongDatabase.getInstance().songDao().upsert(songs);
 
-        return songs;
+        updatePartial(songs);
+        List<Song> songsList = new ArrayList<>(songs.values());
+        SongDatabase.getInstance().songDao().upsert(songsList);
+
+        return songsList;
+    }
+
+    private static void updatePartial(Map<Uri, Song> newSongs) {
+        List<Song> cachedSongs = SongDatabase.getInstance().songDao().getSongs();
+        if (cachedSongs == null)
+            return;
+        for (Song cachedSong : cachedSongs) {
+            Song newSong = newSongs.get(cachedSong.getSongUri());
+            if (newSong != null) {
+                //TODO Add favorites
+                newSong.setLyrics(cachedSong.getLyrics());
+            }
+        }
     }
 }

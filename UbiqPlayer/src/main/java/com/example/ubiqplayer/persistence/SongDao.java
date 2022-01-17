@@ -1,5 +1,7 @@
 package com.example.ubiqplayer.persistence;
 
+import android.net.Uri;
+
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
@@ -30,6 +32,9 @@ public abstract class SongDao {
 
     @Update
     public abstract void update(Song song);
+
+    @Query("SELECT lyrics FROM Song WHERE songUri = :songUri")
+    public abstract String getLyrics(Uri songUri);
 
     @Transaction
     public void upsert(List<Song> songs) {

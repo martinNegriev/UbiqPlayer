@@ -28,6 +28,7 @@ import com.example.ubiqplayer.R;
 import com.example.ubiqplayer.databinding.MusicBottomSheetLayoutBinding;
 import com.example.ubiqplayer.mediaplayer.MediaPlayerService;
 import com.example.ubiqplayer.mediaplayer.lyricsfinder.LyricsFinder;
+import com.example.ubiqplayer.persistence.SongDatabase;
 import com.example.ubiqplayer.ui.adapters.HomeAdapter;
 import com.example.ubiqplayer.ui.helper.ResultTask;
 import com.example.ubiqplayer.ui.models.Song;
@@ -37,6 +38,7 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -146,60 +148,7 @@ public class MusicBottomSheet {
                 hideLyricsView();
                 return;
             }
-            new ResultTask<List<String>>() {
-
-                @Override
-                protected List<String> doInBackground() {
-                    Song currentSong = MediaPlayerService.getCurrentSong();
-                    if (currentSong == null)
-                        return null;
-                    String artist = currentSong.getArtist();
-                    String title = currentSong.getTitle();
-                    String query;
-                    if (!TextUtils.isEmpty(artist) && !TextUtils.isEmpty(title))
-                        query = artist + " " + title;
-                    else if (!TextUtils.isEmpty(title))
-                        query = title;
-                    else {
-                        return null;
-                    }
-                    List<String> urls;
-                    try {
-                        urls = LyricsFinder.INSTANCE.find(query + " song lyrics");
-                        if (urls == null || urls.isEmpty()) {
-                            Toast.makeText(App.get(), R.string.toast_msg_no_lyrics_found, Toast.LENGTH_LONG).show();
-                            return null;
-                        }
-                    } catch (Exception e) {
-                        Toast.makeText(App.get(), R.string.toast_msg_no_lyrics_found, Toast.LENGTH_LONG).show();
-                        return null;
-                    }
-                    List<String> lyricsList = new ArrayList<>();
-                    for (String url : urls) {
-                        String lyrics;
-                        try {
-                            lyrics = LyricsFinder.INSTANCE.findLyrics(url);
-                        } catch (Exception e) {
-                            continue;
-                        }
-                        if (lyrics != null && lyrics.length() > MIN_LENGTH_LYRICS)
-                            lyricsList.add(lyrics);
-                    }
-                    return lyricsList;
-                }
-
-                @Override
-                protected void onPostExecute(List<String> lyrics) {
-                    // TODO Cache already loaded lyrics, implement next lyrics button
-                    if (lyrics == null || lyrics.isEmpty()) {
-                        Toast.makeText(App.get(), R.string.toast_msg_no_lyrics_found, Toast.LENGTH_LONG).show();
-                        return;
-                    }
-                    MediaPlayerService.setCurrentSongLyricsList(lyrics);
-                    String firstLyrics = lyrics.get(0);
-                    showLyricsView(firstLyrics);
-                }
-            }.start();
+            seekLyricsInWeb();
 
             GestureDetector detector = new GestureDetector(binding.bottomSheetContent.getContext(), new GestureDetector.OnGestureListener() {
                 @Override
@@ -241,13 +190,17 @@ public class MusicBottomSheet {
                     if (velocityX > 0 && ind > 0) {
                         // left
                         String newLyrics = lyrics.get(ind - 1);
-                        if (!TextUtils.isEmpty(newLyrics))
+                        if (!TextUtils.isEmpty(newLyrics)) {
                             binding.playerLyricsView.setText(newLyrics);
+                            currentSong.setLyrics(newLyrics);
+                        }
                     } else if (velocityX < 0 && ind < lyrics.size() - 1) {
                         // right
                         String newLyrics = lyrics.get(ind + 1);
-                        if (!TextUtils.isEmpty(newLyrics))
+                        if (!TextUtils.isEmpty(newLyrics)) {
                             binding.playerLyricsView.setText(newLyrics);
+                            currentSong.setLyrics(newLyrics);
+                        }
                     }
                     return false;
                 }
@@ -265,8 +218,82 @@ public class MusicBottomSheet {
         });
 
         binding.playerSaveLyricsButton.setOnClickListener(v -> {
-            //TODO save lyrics in DB
+            new Thread(() -> {
+                Song currentSong = MediaPlayerService.getCurrentSong();
+                String lyrics = SongDatabase.getInstance().songDao().getLyrics(currentSong.getSongUri());
+                if (!TextUtils.isEmpty(lyrics)) {
+                    currentSong.setLyrics(null);
+                    App.HANDLER.post(() -> binding.playerLyricsButton.callOnClick());
+                } else
+                    MediaPlayerService.setCurrentSongLyricsList(Collections.singletonList(lyrics));
+                SongDatabase.getInstance().songDao().update(currentSong);
+                initLyricsMode();
+            }).start();
         });
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private void seekLyricsInWeb() {
+        new ResultTask<List<String>>() {
+
+            @Override
+            protected List<String> doInBackground() {
+                Song currentSong = MediaPlayerService.getCurrentSong();
+                if (currentSong == null)
+                    return null;
+                String cachedLyrics = SongDatabase.getInstance().songDao().getLyrics(currentSong.getSongUri());
+                if (!TextUtils.isEmpty(cachedLyrics)) {
+                    List<String> lyricsList = new ArrayList<>();
+                    lyricsList.add(cachedLyrics);
+                    return lyricsList;
+                }
+                String artist = currentSong.getArtist();
+                String title = currentSong.getTitle();
+                String query;
+                if (!TextUtils.isEmpty(artist) && !TextUtils.isEmpty(title))
+                    query = artist + " " + title;
+                else if (!TextUtils.isEmpty(title))
+                    query = title;
+                else {
+                    return null;
+                }
+                List<String> urls;
+                try {
+                    urls = LyricsFinder.INSTANCE.find(query + " song lyrics");
+                    if (urls == null || urls.isEmpty()) {
+                        Toast.makeText(App.get(), R.string.toast_msg_no_lyrics_found, Toast.LENGTH_LONG).show();
+                        return null;
+                    }
+                } catch (Exception e) {
+                    Toast.makeText(App.get(), R.string.toast_msg_no_lyrics_found, Toast.LENGTH_LONG).show();
+                    return null;
+                }
+                List<String> lyricsList = new ArrayList<>();
+                for (String url : urls) {
+                    String lyrics;
+                    try {
+                        lyrics = LyricsFinder.INSTANCE.findLyrics(url);
+                    } catch (Exception e) {
+                        continue;
+                    }
+                    if (lyrics != null && lyrics.length() > MIN_LENGTH_LYRICS)
+                        lyricsList.add(lyrics);
+                }
+                return lyricsList;
+            }
+
+            @Override
+            protected void onPostExecute(List<String> lyrics) {
+                if (lyrics == null || lyrics.isEmpty()) {
+                    Toast.makeText(App.get(), R.string.toast_msg_no_lyrics_found, Toast.LENGTH_LONG).show();
+                    return;
+                }
+                MediaPlayerService.setCurrentSongLyricsList(lyrics);
+                String firstLyrics = lyrics.get(0);
+                MediaPlayerService.getCurrentSong().setLyrics(firstLyrics);
+                showLyricsView(firstLyrics);
+            }
+        }.start();
     }
 
     public void hideLyricsView() {
@@ -401,6 +428,7 @@ public class MusicBottomSheet {
         binding.playerShuffle.setColorFilter(ctx.getResources().getColor(R.color.iconInactiveColor, ctx.getTheme()), PorterDuff.Mode.SRC_IN);
     }
 
+    @SuppressLint("StaticFieldLeak")
     private void initLyricsMode() {
         if (MediaPlayerService.getState() == ExoPlayer.STATE_IDLE)
             return;
@@ -408,7 +436,19 @@ public class MusicBottomSheet {
         boolean isLyricsModeEnabled = binding.playerThumb.getVisibility() == View.GONE;
         if (isLyricsModeEnabled) {
             binding.playerLyricsButton.setColorFilter(ctx.getResources().getColor(R.color.colorAccent, ctx.getTheme()), PorterDuff.Mode.SRC_IN);
-            // TODO if (lyrics.isCached) -> saveButton.setColorFilter(colorAccent)
+            new ResultTask<String>() {
+
+                @Override
+                protected String doInBackground() {
+                    return SongDatabase.getInstance().songDao().getLyrics(MediaPlayerService.getCurrentSong().getSongUri());
+                }
+
+                @Override
+                protected void onPostExecute(String cachedLyrics) {
+                    int color = !TextUtils.isEmpty(cachedLyrics) ? R.color.colorAccent : R.color.iconInactiveColor;
+                    binding.playerSaveLyricsButton.setColorFilter(ctx.getResources().getColor(color, ctx.getTheme()), PorterDuff.Mode.SRC_IN);
+                }
+            }.start();
             return;
         }
         binding.playerLyricsButton.setColorFilter(ctx.getResources().getColor(R.color.iconInactiveColor, ctx.getTheme()), PorterDuff.Mode.SRC_IN);

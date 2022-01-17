@@ -243,7 +243,6 @@ public class MediaPlayerService extends LifecycleService {
             Drawable defaultThumb = AppCompatDrawableManager.get().getDrawable(App.get(), R.drawable.ic_audio_file);
             notificationBuilder.setLargeIcon(CommonUtils.getBitmap(defaultThumb, pxInt_200, pxInt_200));
         }
-        // TODO Shuffle and loop
 
 
 
