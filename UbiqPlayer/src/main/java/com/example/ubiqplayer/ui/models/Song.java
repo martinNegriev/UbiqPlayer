@@ -1,13 +1,12 @@
 package com.example.ubiqplayer.ui.models;
 
-import android.graphics.Bitmap;
 import android.net.Uri;
 
 import androidx.room.Entity;
 
 @Entity
 public class Song {
-    private Uri uri;
+    private Uri songUri;
     private String title;
     private String artist;
     private long duration;
@@ -16,13 +15,13 @@ public class Song {
     private long albumId;
     private String displayName;
 
-    public Song(String title, String displayName, String artist, long duration, String mimetype, Uri uri, long size) {
+    public Song(String title, String displayName, String artist, long duration, String mimetype, Uri songUri, long size) {
         this.title = title;
         this.artist = artist;
         this.displayName = displayName;
         this.duration = duration;
         this.mimetype = mimetype;
-        this.uri = uri;
+        this.songUri = songUri;
         this.size = size;
     }
 
@@ -50,12 +49,12 @@ public class Song {
         this.mimetype = mimetype;
     }
 
-    public Uri getUri() {
-        return uri;
+    public Uri getSongUri() {
+        return songUri;
     }
 
-    public void setUri(Uri uri) {
-        this.uri = uri;
+    public void setSongUri(Uri songUri) {
+        this.songUri = songUri;
     }
 
     public String getArtist() {

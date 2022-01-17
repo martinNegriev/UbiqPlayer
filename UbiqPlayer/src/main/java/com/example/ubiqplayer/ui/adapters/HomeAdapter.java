@@ -63,7 +63,7 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         songHolder.titleView.setText(correspondingSong.getTitle());
         songHolder.durationView.setText(SongUtils.getFormattedDuration(correspondingSong.getDuration()));
         songHolder.song = correspondingSong;
-        if (MediaPlayerService.getState() != Player.STATE_IDLE && correspondingSong.getUri().equals(MediaPlayerService.getCurrentSong().getUri())) {
+        if (MediaPlayerService.getState() != Player.STATE_IDLE && correspondingSong.getSongUri().equals(MediaPlayerService.getCurrentSong().getSongUri())) {
             songHolder.artistView.setTextColor(ctx.getResources().getColor(R.color.colorAccent, ctx.getTheme()));
             songHolder.titleView.setTextColor(ctx.getResources().getColor(R.color.colorAccent, ctx.getTheme()));
             songHolder.durationView.setTextColor(ctx.getResources().getColor(R.color.colorAccent, ctx.getTheme()));
@@ -92,7 +92,7 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     private void processBitmap(SongViewHolder songHolder) {
-        Bitmap cached = getBitmapFromMemCache(songHolder.song.getUri().toString());
+        Bitmap cached = getBitmapFromMemCache(songHolder.song.getSongUri().toString());
         if (cached != null) {
             songHolder.setThumbnail(cached);
             return;
@@ -101,9 +101,9 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         new ResultTask<Bitmap>() {
             @Override
             protected Bitmap doInBackground() {
-                Bitmap b = songHolder.loadThumbnail(songHolder.song.getUri());
+                Bitmap b = songHolder.loadThumbnail(songHolder.song.getSongUri());
                 if (b != null)
-                    addBitmapToMemoryCache(songHolder.song.getUri().toString(), b);
+                    addBitmapToMemoryCache(songHolder.song.getSongUri().toString(), b);
 
                 return b;
             }

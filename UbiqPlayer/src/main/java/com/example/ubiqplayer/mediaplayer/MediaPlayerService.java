@@ -172,14 +172,14 @@ public class MediaPlayerService extends LifecycleService {
     }
 
     public static void playSong(@NonNull Song currentSong, @NonNull List<Song> songList) {
-        MediaItem mediaItem = MediaItem.fromUri(currentSong.getUri());
+        MediaItem mediaItem = MediaItem.fromUri(currentSong.getSongUri());
         int currSongInd = 0;
         playerCore.clearMediaItems();
         for (int i = 0; i < songList.size(); i++) {
             Song s = songList.get(i);
-            if (currentSong.getUri().equals(s.getUri()))
+            if (currentSong.getSongUri().equals(s.getSongUri()))
                 currSongInd = i;
-            playerCore.addMediaItem(MediaItem.fromUri(s.getUri()));
+            playerCore.addMediaItem(MediaItem.fromUri(s.getSongUri()));
         }
         MediaPlayerService.currentSong = currentSong;
         MediaPlayerService.currentItem = mediaItem;
@@ -215,7 +215,7 @@ public class MediaPlayerService extends LifecycleService {
         PendingIntent pPrevious = PendingIntent.getBroadcast(App.get(), 0, prev, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         PendingIntent pNext = PendingIntent.getBroadcast(App.get(), 0, next, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         PendingIntent pPlay = PendingIntent.getBroadcast(App.get(), 0, play, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        Bitmap thumb = HomeAdapter.getBitmapFromMemCache(song.getUri().toString());
+        Bitmap thumb = HomeAdapter.getBitmapFromMemCache(song.getSongUri().toString());
         mediaSession.setMetadata(new MediaMetadataCompat.Builder()
                 .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, song.getArtist())
                 .putString(MediaMetadataCompat.METADATA_KEY_TITLE, song.getTitle())
@@ -389,7 +389,7 @@ public class MediaPlayerService extends LifecycleService {
             currentSongLyricsList = null;
             return;
         }
-        currentSongLyricsList = Collections.singletonMap(getCurrentSong().getUri(), lyricsList);
+        currentSongLyricsList = Collections.singletonMap(getCurrentSong().getSongUri(), lyricsList);
     }
 
     @Nullable

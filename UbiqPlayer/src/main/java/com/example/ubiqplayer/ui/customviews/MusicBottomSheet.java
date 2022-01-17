@@ -28,11 +28,9 @@ import com.example.ubiqplayer.R;
 import com.example.ubiqplayer.databinding.MusicBottomSheetLayoutBinding;
 import com.example.ubiqplayer.mediaplayer.MediaPlayerService;
 import com.example.ubiqplayer.mediaplayer.lyricsfinder.LyricsFinder;
-import com.example.ubiqplayer.mediaplayer.lyricsfinder.LyricsFinderKt;
 import com.example.ubiqplayer.ui.adapters.HomeAdapter;
 import com.example.ubiqplayer.ui.helper.ResultTask;
 import com.example.ubiqplayer.ui.models.Song;
-import com.example.ubiqplayer.utils.CommonUtils;
 import com.example.ubiqplayer.utils.SongUtils;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Player;
@@ -232,7 +230,7 @@ public class MusicBottomSheet {
                     String currentLyrics = binding.playerLyricsView.getText().toString();
                     if (currentSongLyricsList == null
                             || currentSong == null
-                            || !currentSongLyricsList.keySet().toArray()[0].equals(currentSong.getUri())
+                            || !currentSongLyricsList.keySet().toArray()[0].equals(currentSong.getSongUri())
                             || TextUtils.isEmpty(currentLyrics))
                         return false;
                     List<List<String>> lyricsList = new ArrayList<>(currentSongLyricsList.values());
@@ -331,7 +329,7 @@ public class MusicBottomSheet {
         binding.playerCurrentPos.setText(SongUtils.getFormattedDuration(MediaPlayerService.getPlaybackPosition()));
         initShuffleMode(false);
         initRepeatMode(false);
-        Bitmap thumb = HomeAdapter.getBitmapFromMemCache(playingSong.getUri().toString());
+        Bitmap thumb = HomeAdapter.getBitmapFromMemCache(playingSong.getSongUri().toString());
         if (thumb != null)
             binding.playerThumb.setImageBitmap(thumb);
         else
