@@ -68,6 +68,14 @@ public class MediaStoreUtil {
         return songsList;
     }
 
+    public static List<Song> queryFavorites() {
+        List<Song> favs = new ArrayList<>();
+        List<Song> cachedFavs = SongDatabase.getInstance().songDao().getFavoriteSongs();
+        if (cachedFavs != null)
+            favs.addAll(cachedFavs);
+        return favs;
+    }
+
     private static void updatePartial(Map<Uri, Song> newSongs) {
         List<Song> cachedSongs = SongDatabase.getInstance().songDao().getSongs();
         if (cachedSongs == null)
@@ -75,7 +83,8 @@ public class MediaStoreUtil {
         for (Song cachedSong : cachedSongs) {
             Song newSong = newSongs.get(cachedSong.getSongUri());
             if (newSong != null) {
-                //TODO Add favorites
+                //TODO Add playlist stuff maaybe?
+                newSong.setFavorite(cachedSong.isFavorite());
                 newSong.setLyrics(cachedSong.getLyrics());
             }
         }

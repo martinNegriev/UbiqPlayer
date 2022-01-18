@@ -230,6 +230,31 @@ public class MusicBottomSheet {
                 initLyricsMode();
             }).start();
         });
+
+        initFavsMode(null);
+        binding.playerFavsButton.setOnClickListener(v -> {
+            new ResultTask<Long>() {
+                Boolean isFav = null;
+                @Override
+                protected Long doInBackground() {
+                    Song currentSong = MediaPlayerService.getCurrentSong();
+                    int state = currentSong.isFavorite() ? 0 : 1;
+                    long res = SongDatabase.getInstance().songDao().toggleFavorite(state, currentSong.getSongUri());
+                    if (res > 0) {
+                        isFav = state == 1;
+                        currentSong.setFavorite(isFav);
+                    }
+                    return res;
+                }
+
+                @Override
+                protected void onPostExecute(Long updated) {
+                    if (updated <= 0)
+                        return;
+                    initFavsMode(isFav);
+                    }
+            }.start();
+        });
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -299,7 +324,7 @@ public class MusicBottomSheet {
     public void hideLyricsView() {
         View playerThumb = binding.playerThumb;
         binding.playerLyricsView.setVisibility(View.GONE);
-        binding.playerLayoutLyricsControls.setVisibility(View.INVISIBLE);
+        binding.playerSaveLyricsButton.setVisibility(View.INVISIBLE);
         playerThumb.setVisibility(View.VISIBLE);
         playerThumb.animate()
                 .alpha(1.0f)
@@ -326,7 +351,7 @@ public class MusicBottomSheet {
                         binding.playerLyricsView.setText(lyrics);
                         binding.playerLyricsView.setMovementMethod(new ScrollingMovementMethod());
                         binding.playerLyricsView.setVisibility(View.VISIBLE);
-                        binding.playerLayoutLyricsControls.setVisibility(View.VISIBLE);
+                        binding.playerSaveLyricsButton.setVisibility(View.VISIBLE);
                         initLyricsMode();
                     }
                 });
@@ -356,6 +381,7 @@ public class MusicBottomSheet {
         binding.playerCurrentPos.setText(SongUtils.getFormattedDuration(MediaPlayerService.getPlaybackPosition()));
         initShuffleMode(false);
         initRepeatMode(false);
+        initFavsMode(null);
         Bitmap thumb = HomeAdapter.getBitmapFromMemCache(playingSong.getSongUri().toString());
         if (thumb != null)
             binding.playerThumb.setImageBitmap(thumb);
@@ -452,6 +478,20 @@ public class MusicBottomSheet {
             return;
         }
         binding.playerLyricsButton.setColorFilter(ctx.getResources().getColor(R.color.iconInactiveColor, ctx.getTheme()), PorterDuff.Mode.SRC_IN);
+    }
+
+    private void initFavsMode(Boolean fav) {
+        boolean isFav;
+        if (fav != null)
+            isFav = fav;
+        else {
+            Song song = MediaPlayerService.getCurrentSong();
+            if (song == null)
+                return;
+            isFav = song.isFavorite();
+        }
+        Context ctx = binding.playerFavsButton.getContext();
+        binding.playerFavsButton.setColorFilter(ctx.getResources().getColor(isFav ? R.color.colorAccent : R.color.iconInactiveColor, ctx.getTheme()), PorterDuff.Mode.SRC_IN);
     }
 
 }

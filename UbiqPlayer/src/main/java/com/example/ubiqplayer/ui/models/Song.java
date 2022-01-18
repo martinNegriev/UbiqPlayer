@@ -36,6 +36,9 @@ public class Song {
     @ColumnInfo(name = "lyrics")
     private String lyrics;
 
+    @ColumnInfo(name = "favorite")
+    private boolean favorite;
+
     public Song(String title, String displayName, String artist, long duration, String mimetype, @NonNull Uri songUri, long size) {
         this.title = title;
         this.artist = artist;
@@ -116,5 +119,13 @@ public class Song {
 
     public void setLyrics(String lyrics) {
         this.lyrics = lyrics;
+    }
+
+    public boolean isFavorite() {
+        return favorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        this.favorite = favorite;
     }
 }

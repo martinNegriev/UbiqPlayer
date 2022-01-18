@@ -36,6 +36,12 @@ public abstract class SongDao {
     @Query("SELECT lyrics FROM Song WHERE songUri = :songUri")
     public abstract String getLyrics(Uri songUri);
 
+    @Query("SELECT * FROM Song WHERE favorite = 1")
+    public abstract List<Song> getFavoriteSongs();
+
+    @Query("UPDATE song SET favorite = :state WHERE songUri = :songUri")
+    public abstract int toggleFavorite(int state, Uri songUri);
+
     @Transaction
     public void upsert(List<Song> songs) {
         List<Long> insertResult = insertSongs(songs);
