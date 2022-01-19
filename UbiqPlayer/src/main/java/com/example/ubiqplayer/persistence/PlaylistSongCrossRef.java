@@ -5,9 +5,11 @@ import android.net.Uri;
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 
-@Entity(primaryKeys = {"playlistId", "songUri"})
+@Entity(primaryKeys = {"playlistName", "songUri"})
 public class PlaylistSongCrossRef {
 
-    public long playlistId;
-    @NonNull public Uri songUri;
+    @NonNull
+    public String playlistName;
+    @NonNull
+    public Uri songUri;
 }

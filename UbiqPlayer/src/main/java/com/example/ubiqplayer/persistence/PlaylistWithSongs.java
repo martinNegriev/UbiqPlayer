@@ -14,12 +14,12 @@ public class PlaylistWithSongs {
     public Playlist playlist;
 
     @Relation(
-            parentColumn = "playlistId",
+            parentColumn = "playlistName",
             entity = Song.class,
             entityColumn = "songUri",
             associateBy = @Junction(
                     value = PlaylistSongCrossRef.class,
-                    parentColumn = "playlistId",
+                    parentColumn = "playlistName",
                     entityColumn = "songUri")
     )
     public List<Song> songs;

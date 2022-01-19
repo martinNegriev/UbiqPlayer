@@ -6,18 +6,49 @@
     android:layout_height="match_parent"
     tools:context=".ui.playlists.PlaylistsFragment">
 
-    <TextView
-        android:id="@+id/text_gallery"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/playlists_recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        android:text="Playlists TODO"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:visibility="gone"
+        android:layout_height="match_parent"/>
+
+    <RelativeLayout
+        android:id="@+id/no_playlists_layout"
+        android:layout_width="match_parent"
+        android:gravity="center_vertical"
+        android:visibility="visible"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/no_playlists_icon"
+            android:layout_width="match_parent"
+            app:srcCompat="@drawable/ic_no_playlists"
+            android:layout_height="160dp"
+            android:layout_alignParentTop="true"/>
+
+        <TextView
+            android:id="@+id/no_playlists_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:textAlignment="center"
+            android:layout_below="@id/no_playlists_icon"
+            android:textSize="28sp"
+            android:text="@string/no_playlists_msg"
+            android:textColor="@color/textColor"/>
+
+        <ImageView
+            android:id="@+id/add_playlist_button"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:srcCompat="@drawable/ic_add"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/no_playlists_message"
+            android:focusable="true"
+            android:clickable="true"
+            android:background="?attr/selectableItemBackground"/>
+    </RelativeLayout>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

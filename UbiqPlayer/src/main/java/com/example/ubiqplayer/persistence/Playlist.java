@@ -1,5 +1,6 @@
 package com.example.ubiqplayer.persistence;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -8,8 +9,6 @@ import androidx.room.PrimaryKey;
 public class Playlist {
 
     @PrimaryKey
-    public long playlistId;
-
-    @ColumnInfo(name = "playlistName")
+    @NonNull
     public String playlistName;
 }

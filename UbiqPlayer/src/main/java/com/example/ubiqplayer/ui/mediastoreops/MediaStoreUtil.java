@@ -7,6 +7,7 @@ import android.os.Build;
 import android.provider.MediaStore;
 
 import com.example.ubiqplayer.App;
+import com.example.ubiqplayer.persistence.PlaylistWithSongs;
 import com.example.ubiqplayer.persistence.SongDatabase;
 import com.example.ubiqplayer.ui.models.Song;
 
@@ -74,6 +75,14 @@ public class MediaStoreUtil {
         if (cachedFavs != null)
             favs.addAll(cachedFavs);
         return favs;
+    }
+
+    public static List<PlaylistWithSongs> queryPlaylists() {
+        List<PlaylistWithSongs> playlists = new ArrayList<>();
+        List<PlaylistWithSongs> cachedPlaylists = SongDatabase.getInstance().songDao().getPlaylistWithSongs();
+        if (cachedPlaylists != null)
+            playlists.addAll(cachedPlaylists);
+        return playlists;
     }
 
     private static void updatePartial(Map<Uri, Song> newSongs) {

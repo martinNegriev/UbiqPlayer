@@ -25,6 +25,7 @@ public class FavoritesFragment extends BaseFragment implements ISongClickListene
     private FavoritesViewModel favsViewModel;
     private RecyclerView recyclerView;
     private FavoritesAdapter favsAdapter;
+    private View emptyLayout;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -32,7 +33,16 @@ public class FavoritesFragment extends BaseFragment implements ISongClickListene
         favsViewModel = new ViewModelProvider(this).get(FavoritesViewModel.class);
 
         // Start observing
-        favsViewModel.getFavsData().observe(this, songs -> favsAdapter.updateData(songs));
+        favsViewModel.getFavsData().observe(this, songs -> {
+            if (songs == null || songs.isEmpty()) {
+                emptyLayout.setVisibility(View.VISIBLE);
+                recyclerView.setVisibility(View.GONE);
+            } else {
+                emptyLayout.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
+            }
+            favsAdapter.updateData(songs);
+        });
     }
 
     private void initRecyclerView() {
@@ -48,6 +58,7 @@ public class FavoritesFragment extends BaseFragment implements ISongClickListene
         View root = inflater.inflate(R.layout.fragment_favorites, container, false);
         // Init recyclerView, view model, adapter
         recyclerView = root.findViewById(R.id.favorites_recycler_view);
+        emptyLayout = root.findViewById(R.id.no_favs_layout);
         initRecyclerView();
         return root;
     }

@@ -42,6 +42,9 @@ public abstract class SongDao {
     @Query("UPDATE song SET favorite = :state WHERE songUri = :songUri")
     public abstract int toggleFavorite(int state, Uri songUri);
 
+    @Query("SELECT * FROM playlist WHERE playlistName = :playlistName")
+    public abstract Playlist getPlaylistByName(String playlistName);
+
     @Transaction
     public void upsert(List<Song> songs) {
         List<Long> insertResult = insertSongs(songs);
@@ -56,4 +59,7 @@ public abstract class SongDao {
             update(updateList);
         }
     }
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    public abstract void insertPlaylists(List<Playlist> newPlayLists);
 }

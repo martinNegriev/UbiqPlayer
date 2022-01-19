@@ -18,4 +18,16 @@
     <string name="change_theme">Change theme</string>
     <string name="ubiq_player_channel_str">Ubiq Player</string>
     <string name="toast_msg_no_lyrics_found">No lyrics found</string>
+    <string name="no_playlists_msg">No playlists found</string>
+    <string name="no_favorites_msg">No favorites found</string>
+    <plurals name="songs_in_playlist_num">
+        <item quantity="one">%1$d song</item>
+        <item quantity="other">%1$d songs</item>
+    </plurals>
+    <string name="new_playlist">New playlist</string>
+    <string name="enter_playlist_name">Enter your playlist\'s name</string>
+    <string name="ok_button">OK</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="playlist_already_exists_msg">Playlist already exists</string>
+    <string name="add_playlist_action">Add new playlist</string>
 </resources>

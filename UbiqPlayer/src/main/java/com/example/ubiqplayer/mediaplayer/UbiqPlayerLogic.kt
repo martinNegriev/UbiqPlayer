@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.view.View
+import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.ubiqplayer.BaseFragment
 import com.example.ubiqplayer.UbiqPlayerActivity
@@ -29,21 +30,26 @@ class UbiqPlayerLogic(val act: UbiqPlayerActivity) {
         registered = false
     }
 
+    fun getCurrentFragment(): Fragment? {
+        var frag = act.supportFragmentManager.fragments.last()
+        var navFrag = act.supportFragmentManager.primaryNavigationFragment
+        if (frag.equals(navFrag) && frag is UbiqPlayerNavHostFragment) {
+            if (frag.isAttached())
+                frag = frag.childFragmentManager.fragments.last()
+            else {
+                navFrag = act.supportFragmentManager.primaryNavigationFragment
+                frag = navFrag?.childFragmentManager?.fragments?.last()
+            }
+        }
+        return frag
+    }
+
     private val receiver: BroadcastReceiver = object: BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val action = intent.action
             when {
                 action == MediaPlayerActions.ACTION_REFRESH_UI || action == MediaPlayerActions.ACTION_REFRESH_UI_ITEM_TRANSITION -> {
-                    var frag = act.supportFragmentManager.fragments.last()
-                    var navFrag = act.supportFragmentManager.primaryNavigationFragment
-                    if (frag.equals(navFrag) && frag is UbiqPlayerNavHostFragment) {
-                        if (frag.isAttached())
-                            frag = frag.childFragmentManager.fragments.last()
-                        else {
-                            navFrag = act.supportFragmentManager.primaryNavigationFragment
-                            frag = navFrag?.childFragmentManager?.fragments?.last()
-                        }
-                    }
+                    val frag = getCurrentFragment()
                     if (frag is BaseFragment)
                         frag.notifyAdapterDataSetChanged()
                     act.musicBottomSheet.refreshUI()
