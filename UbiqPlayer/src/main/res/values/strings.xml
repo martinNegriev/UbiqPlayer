@@ -30,4 +30,5 @@
     <string name="cancel_button">Cancel</string>
     <string name="playlist_already_exists_msg">Playlist already exists</string>
     <string name="add_playlist_action">Add new playlist</string>
+    <string name="no_songs_in_playlist">No songs added to this playlist</string>
 </resources>

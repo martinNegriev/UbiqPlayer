@@ -2,6 +2,7 @@ package com.example.ubiqplayer;
 
 import android.annotation.SuppressLint;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,5 +22,14 @@ public abstract class BaseFragment extends Fragment {
         if (adapter == null)
             return;
         adapter.notifyDataSetChanged();
+    }
+
+    protected boolean isNavChildFragment() {
+        return false;
+    }
+
+    @NonNull
+    public String getLocationName() {
+        return "";
     }
 }

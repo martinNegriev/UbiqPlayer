@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.ubiqplayer.App;
 import com.example.ubiqplayer.BaseFragment;
 import com.example.ubiqplayer.R;
 import com.example.ubiqplayer.ui.adapters.FavoritesAdapter;
@@ -58,6 +59,7 @@ public class FavoritesFragment extends BaseFragment implements ISongClickListene
         View root = inflater.inflate(R.layout.fragment_favorites, container, false);
         // Init recyclerView, view model, adapter
         recyclerView = root.findViewById(R.id.favorites_recycler_view);
+        recyclerView.setItemAnimator(null);
         emptyLayout = root.findViewById(R.id.no_favs_layout);
         initRecyclerView();
         return root;
@@ -81,5 +83,16 @@ public class FavoritesFragment extends BaseFragment implements ISongClickListene
         if (songs == null)
             return;
         getUbiqPlayerActivity().startPlayback(playerSong, songs);
+    }
+
+    @Override
+    protected boolean isNavChildFragment() {
+        return true;
+    }
+
+    @NonNull
+    @Override
+    public String getLocationName() {
+        return App.get().getResources().getString(R.string.menu_favorites);
     }
 }

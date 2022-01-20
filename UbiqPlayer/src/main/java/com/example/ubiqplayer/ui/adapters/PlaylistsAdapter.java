@@ -38,6 +38,7 @@ public class PlaylistsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         PlaylistViewHolder playlistViewHolder = (PlaylistViewHolder) holder;
         PlaylistWithSongs playlist = playlists.get(position);
+        playlistViewHolder.playlist = playlist;
         playlistViewHolder.playlistTitleView.setText(playlist.playlist.playlistName);
         playlistViewHolder.playlistNumItems.setText(App.get().getResources().getQuantityString(R.plurals.songs_in_playlist_num, playlist.songs.size(), playlist.songs.size()));
     }

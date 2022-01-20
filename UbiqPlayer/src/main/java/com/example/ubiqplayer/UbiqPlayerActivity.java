@@ -131,6 +131,10 @@ public class UbiqPlayerActivity extends AppCompatActivity {
         return binding.appBarUbiqPlayer.fab;
     }
 
+    public UbiqPlayerLogic getPlayerLogic() {
+        return playerLogic;
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();

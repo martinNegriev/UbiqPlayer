@@ -14,6 +14,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -34,6 +36,8 @@ import java.util.Collections;
 
 
 public class PlaylistsFragment extends BaseFragment implements IPlaylistClickListener {
+
+    public static final String PLAYLIST_NAME_EXTRA = "PLAYLIST_NAME_EXTRA";
 
     private PlaylistViewModel playlistViewModel;
     private RecyclerView recyclerView;
@@ -65,6 +69,7 @@ public class PlaylistsFragment extends BaseFragment implements IPlaylistClickLis
         View root = inflater.inflate(R.layout.fragment_playlists, container, false);
         // Init recyclerView, view model, adapter
         recyclerView = root.findViewById(R.id.playlists_recycler_view);
+        recyclerView.setItemAnimator(null);
         emptyLayout = root.findViewById(R.id.no_playlists_layout);
         addPlaylistButton = root.findViewById(R.id.add_playlist_button);
         addPlaylistButton.setOnClickListener(v -> addPlaylist());
@@ -118,7 +123,17 @@ public class PlaylistsFragment extends BaseFragment implements IPlaylistClickLis
 
     @Override
     public void onClick(@NonNull PlaylistWithSongs clicked) {
-        //TODO List songs from playlist
+        FragmentManager mgr = getUbiqPlayerActivity().getSupportFragmentManager();
+        FragmentTransaction ft = mgr.beginTransaction();
+        ft.setCustomAnimations(R.anim.slide_in, R.anim.slide_out);
+        View contentLayout = getActivity().findViewById(R.id.content_layout);
+        contentLayout.setVisibility(View.VISIBLE);
+        PlaylistWithSongsFragment playlistWithSongsFragment = new PlaylistWithSongsFragment();
+        Bundle args = new Bundle();
+        args.putString(PLAYLIST_NAME_EXTRA, clicked.playlist.playlistName);
+        playlistWithSongsFragment.setArguments(args);
+        ft.addToBackStack(null).replace(R.id.content_layout, playlistWithSongsFragment);
+        ft.commitAllowingStateLoss();
     }
 
     @Override
@@ -134,5 +149,16 @@ public class PlaylistsFragment extends BaseFragment implements IPlaylistClickLis
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected boolean isNavChildFragment() {
+        return true;
+    }
+
+    @NonNull
+    @Override
+    public String getLocationName() {
+        return App.get().getResources().getString(R.string.menu_playlists);
     }
 }

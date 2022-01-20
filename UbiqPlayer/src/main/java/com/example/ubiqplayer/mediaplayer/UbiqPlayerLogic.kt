@@ -32,14 +32,11 @@ class UbiqPlayerLogic(val act: UbiqPlayerActivity) {
 
     fun getCurrentFragment(): Fragment? {
         var frag = act.supportFragmentManager.fragments.last()
-        var navFrag = act.supportFragmentManager.primaryNavigationFragment
-        if (frag.equals(navFrag) && frag is UbiqPlayerNavHostFragment) {
+        if (frag is UbiqPlayerNavHostFragment) {
             if (frag.isAttached())
                 frag = frag.childFragmentManager.fragments.last()
-            else {
-                navFrag = act.supportFragmentManager.primaryNavigationFragment
-                frag = navFrag?.childFragmentManager?.fragments?.last()
-            }
+            else
+                frag = frag.childFragmentManager.fragments.last()
         }
         return frag
     }

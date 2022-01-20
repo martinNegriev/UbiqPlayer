@@ -35,6 +35,7 @@
             android:textAlignment="center"
             android:layout_below="@id/no_playlists_icon"
             android:textSize="28sp"
+            android:fontFamily="sans-serif-medium"
             android:text="@string/no_playlists_msg"
             android:textColor="@color/textColor"/>
 
