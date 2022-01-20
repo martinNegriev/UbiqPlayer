@@ -161,4 +161,8 @@ public class PlaylistsFragment extends BaseFragment implements IPlaylistClickLis
     public String getLocationName() {
         return App.get().getResources().getString(R.string.menu_playlists);
     }
+
+    public void reloadData() {
+        playlistViewModel.loadPlaylistsData();
+    }
 }

@@ -27,7 +27,7 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private Context context;
     private List<Song> songs = new ArrayList<>();
-    private ISongClickListener songClickListener;
+    protected ISongClickListener songClickListener;
     private static final LruCache<String, Bitmap> memoryCache;
 
     static {

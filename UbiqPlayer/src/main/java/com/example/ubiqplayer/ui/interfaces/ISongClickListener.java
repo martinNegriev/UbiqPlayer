@@ -7,4 +7,6 @@ import com.example.ubiqplayer.ui.models.Song;
 public interface ISongClickListener {
 
     void onClick(@NonNull Song playedSong);
+
+    default void removeSong(@NonNull Song song) {}
 }

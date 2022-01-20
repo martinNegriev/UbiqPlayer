@@ -52,16 +52,12 @@ public class HomeFragment extends BaseFragment implements ISongClickListener {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View root = inflater.inflate(getLayoutResId(), container, false);
+        View root = inflater.inflate(R.layout.fragment_home, container, false);
         // Init recyclerView, view model, adapter
         recyclerView = root.findViewById(R.id.home_recycler_view);
         recyclerView.setItemAnimator(null);
         initRecyclerView();
         return root;
-    }
-
-    protected int getLayoutResId() {
-        return R.layout.fragment_home;
     }
 
     @Override

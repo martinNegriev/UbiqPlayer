@@ -31,4 +31,6 @@
     <string name="playlist_already_exists_msg">Playlist already exists</string>
     <string name="add_playlist_action">Add new playlist</string>
     <string name="no_songs_in_playlist">No songs added to this playlist</string>
+    <string name="song_already_added">Song already added</string>
+    <string name="add_songs_button_text">Add songs</string>
 </resources>
