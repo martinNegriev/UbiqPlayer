@@ -10,8 +10,11 @@ import com.example.ubiqplayer.App;
 import com.example.ubiqplayer.persistence.PlaylistWithSongs;
 import com.example.ubiqplayer.persistence.SongDatabase;
 import com.example.ubiqplayer.ui.models.Song;
+import com.example.ubiqplayer.ui.sorting.Comparators;
+import com.example.ubiqplayer.ui.sorting.SortOption;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,9 +80,16 @@ public class MediaStoreUtil {
         return favs;
     }
 
-    public static List<PlaylistWithSongs> queryPlaylists() {
+    public static List<PlaylistWithSongs> queryPlaylists(SortOption option, boolean reversed) {
         List<PlaylistWithSongs> playlists = new ArrayList<>();
         List<PlaylistWithSongs> cachedPlaylists = SongDatabase.getInstance().songDao().getPlaylistWithSongs();
+
+        if (option == SortOption.NumberOfSongs)
+            cachedPlaylists.sort(new Comparators.NumSongsComparator());
+
+        if (reversed)
+            Collections.reverse(cachedPlaylists);
+
         if (cachedPlaylists != null)
             playlists.addAll(cachedPlaylists);
         return playlists;

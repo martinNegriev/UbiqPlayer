@@ -11,4 +11,6 @@
     <color name="activeNavDrawerItemColor">#9c6eff</color>
     <color name="fabColor">#6200EE</color>
     <color name="iconInactiveColor">#ff000000</color>
+    <color name="dialogBackgroundColor">#fff</color>
+    <color name="dialogActiveTextColor">@color/colorPrimary</color>
 </resources>

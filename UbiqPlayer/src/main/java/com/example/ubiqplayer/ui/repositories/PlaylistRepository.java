@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.ubiqplayer.persistence.PlaylistWithSongs;
 import com.example.ubiqplayer.ui.mediastoreops.MediaStoreUtil;
+import com.example.ubiqplayer.ui.sorting.SortOption;
 import com.example.ubiqplayer.utils.CommonUtils;
 
 import java.util.List;
@@ -25,8 +26,8 @@ public class PlaylistRepository {
         return instance;
     }
 
-    public void loadPlaylists() {
-        CommonUtils.UNBOUNDED_EXECUTOR.execute(() -> playlistsData.postValue(MediaStoreUtil.queryPlaylists()));
+    public void loadPlaylists(SortOption option, boolean reversed) {
+        CommonUtils.UNBOUNDED_EXECUTOR.execute(() -> playlistsData.postValue(MediaStoreUtil.queryPlaylists(option, reversed)));
     }
 
     public MutableLiveData<List<PlaylistWithSongs>> getPlaylistsData() {

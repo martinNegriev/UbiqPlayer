@@ -18,4 +18,30 @@
         <item name="android:windowIsFloating">true</item>
     </style>
 
+    <style name="YourAlertDialog.Button" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/textColor</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:letterSpacing">0</item>
+    </style>
+
+    <style name="MultiChoiceAlertDialog" parent="Theme.MaterialComponents.Light.Dialog.Alert">
+        <item name="buttonBarPositiveButtonStyle">@style/YourAlertDialog.Button</item>
+        <item name="buttonBarNegativeButtonStyle">@style/YourAlertDialog.Button</item>
+        <item name="buttonBarNeutralButtonStyle">@style/YourAlertDialog.Button</item>
+        <item name="android:background">@color/backgroundColor</item>
+        <item name="android:textColorPrimary">@color/textColor</item>
+        <item name="android:textColor">@color/textColor</item>
+        <item name="colorControlNormal">@color/textColor</item>
+        <item name="colorControlActivated">@color/dialogActiveTextColor</item>
+        <item name="dialogCornerRadius">16dp</item>
+    </style>
+
+    <style name="MyRadioButton" parent="Widget.AppCompat.CompoundButton.RadioButton">
+        <item name="android:textColor">@color/textColor</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColorPrimary">@color/textColor</item>
+        <item name="colorControlNormal">@color/textColor</item>
+        <item name="colorControlActivated">@color/dialogActiveTextColor</item>
+    </style>
+
 </resources>

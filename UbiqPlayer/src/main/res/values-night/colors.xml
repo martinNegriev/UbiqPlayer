@@ -9,4 +9,6 @@
     <color name="textColor">#ffffff</color>
     <color name="navDrawerBackgroundColor">#1e1e1e</color>
     <color name="iconInactiveColor">#ffffff</color>
+    <color name="dialogBackgroundColor">#5F467E</color>
+    <color name="dialogActiveTextColor">@color/colorAccent</color>
 </resources>

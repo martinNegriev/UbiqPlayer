@@ -1,6 +1,7 @@
 package com.example.ubiqplayer.ui.playlists;
 
 import android.annotation.SuppressLint;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -10,11 +11,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
@@ -31,7 +34,11 @@ import com.example.ubiqplayer.persistence.SongDatabase;
 import com.example.ubiqplayer.ui.adapters.PlaylistsAdapter;
 import com.example.ubiqplayer.ui.helper.ResultTask;
 import com.example.ubiqplayer.ui.interfaces.IPlaylistClickListener;
+import com.example.ubiqplayer.ui.sorting.SortExtras;
+import com.example.ubiqplayer.ui.sorting.SortLocation;
+import com.example.ubiqplayer.ui.sorting.SortOption;
 import com.example.ubiqplayer.ui.viewmodels.PlaylistViewModel;
+import com.example.ubiqplayer.utils.CommonUtils;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.Collections;
@@ -46,6 +53,10 @@ public class PlaylistsFragment extends BaseFragment implements IPlaylistClickLis
     private View emptyLayout;
     private PlaylistsAdapter playlistsAdapter;
     private ImageView addPlaylistButton;
+    private View recyclerViewLayout;
+    private View sortLayout;
+    private TextView sortBy;
+    private ImageView sortDirection;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -56,10 +67,10 @@ public class PlaylistsFragment extends BaseFragment implements IPlaylistClickLis
         playlistViewModel.getPlaylistsData().observe(this, playlists -> {
             if (playlists == null || playlists.isEmpty()) {
                 emptyLayout.setVisibility(View.VISIBLE);
-                recyclerView.setVisibility(View.GONE);
+                recyclerViewLayout.setVisibility(View.GONE);
             } else {
                 emptyLayout.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
+                recyclerViewLayout.setVisibility(View.VISIBLE);
             }
             playlistsAdapter.updateData(playlists);
         });
@@ -74,6 +85,11 @@ public class PlaylistsFragment extends BaseFragment implements IPlaylistClickLis
         recyclerView.setItemAnimator(null);
         emptyLayout = root.findViewById(R.id.no_playlists_layout);
         addPlaylistButton = root.findViewById(R.id.add_playlist_button);
+        recyclerViewLayout = root.findViewById(R.id.recycler_view_layout);
+        sortLayout = root.findViewById(R.id.sort_layout);
+        sortBy = sortLayout.findViewById(R.id.sorted_by);
+        sortDirection = sortLayout.findViewById(R.id.sort_direction);
+        sortLayout.setOnClickListener(v -> openSortDialog(SortLocation.Playlist));
         addPlaylistButton.setOnClickListener(v -> addPlaylist());
         initRecyclerView();
         setHasOptionsMenu(true);
@@ -97,7 +113,7 @@ public class PlaylistsFragment extends BaseFragment implements IPlaylistClickLis
                         Playlist playlist = new Playlist();
                         playlist.playlistName = editTextInput;
                         SongDatabase.getInstance().songDao().insertPlaylists(Collections.singletonList(playlist));
-                        playlistViewModel.loadPlaylistsData();
+                        applySortAndLoad();
                     }).start();
                 })
                 .setNegativeButton(App.get().getResources().getString(R.string.cancel_button), null)
@@ -115,7 +131,7 @@ public class PlaylistsFragment extends BaseFragment implements IPlaylistClickLis
     @Override
     public void onResume() {
         super.onResume();
-        playlistViewModel.loadPlaylistsData();
+        applySortAndLoad();
     }
 
     @Override
@@ -165,7 +181,7 @@ public class PlaylistsFragment extends BaseFragment implements IPlaylistClickLis
     }
 
     public void reloadData() {
-        playlistViewModel.loadPlaylistsData();
+        applySortAndLoad();
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -182,8 +198,20 @@ public class PlaylistsFragment extends BaseFragment implements IPlaylistClickLis
             protected void onPostExecute(Integer integer) {
                 if (integer <= 0)
                     return;
-                playlistViewModel.loadPlaylistsData();
+                applySortAndLoad();
             }
         }.start();
+    }
+
+    @Override
+    protected void applySortAndLoad() {
+        SortOption option = SortOption.getByName(CommonUtils.getSharedPrefs(SortExtras.SORT_PREFS_NAME).getString(SortExtras.SORT_EXTRA_PLAYLISTS, SortOption.Name.name()));
+        boolean reversed = CommonUtils.getSharedPrefs(SortExtras.SORT_PREFS_NAME).getBoolean(SortExtras.SORT_EXTRA_PLAYLISTS_REVERSED, false);
+        App.HANDLER.post(() -> {
+            sortBy.setText(option.getName());
+            sortDirection.setImageDrawable(ResourcesCompat.getDrawable(App.get().getResources(), reversed ? R.drawable.ic_desc : R.drawable.ic_asc, getContext().getTheme()));
+            sortDirection.setColorFilter(getContext().getResources().getColor(R.color.textColor, getContext().getTheme()), PorterDuff.Mode.SRC_IN);
+        });
+        playlistViewModel.loadPlaylistsData(option, reversed);
     }
 }

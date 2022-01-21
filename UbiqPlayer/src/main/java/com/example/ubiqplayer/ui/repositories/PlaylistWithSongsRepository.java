@@ -5,9 +5,12 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.ubiqplayer.persistence.PlaylistWithSongs;
 import com.example.ubiqplayer.persistence.SongDatabase;
 import com.example.ubiqplayer.ui.models.Song;
+import com.example.ubiqplayer.ui.sorting.Comparators;
+import com.example.ubiqplayer.ui.sorting.SortOption;
 import com.example.ubiqplayer.utils.CommonUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class PlaylistWithSongsRepository {
@@ -31,14 +34,26 @@ public class PlaylistWithSongsRepository {
         return songsData;
     }
 
-    public void loadSongsForPlaylist(String playlistName) {
+    public void loadSongsForPlaylist(String playlistName, SortOption sortOption, boolean reversed) {
         CommonUtils.UNBOUNDED_EXECUTOR.execute(() -> {
             PlaylistWithSongs playlistWithSongs = SongDatabase.getInstance().songDao().getPlaylistWithSongsByName(playlistName);
             if (playlistWithSongs == null || playlistWithSongs.songs == null || playlistWithSongs.songs.isEmpty()) {
                 songsData.postValue(new ArrayList<>());
                 return;
             }
-            songsData.postValue(playlistWithSongs.songs);
+            List<Song> playlistSongs = playlistWithSongs.songs;
+
+            if (sortOption == SortOption.Artist)
+                playlistSongs.sort(new Comparators.ArtistComparator());
+            else if (sortOption == SortOption.Title)
+                playlistSongs.sort(new Comparators.TitleComparator());
+            else if (sortOption == SortOption.Duration)
+                playlistSongs.sort(new Comparators.DurationComparator());
+
+            if (reversed)
+                Collections.reverse(playlistSongs);
+
+            songsData.postValue(playlistSongs);
         });
     }
 }

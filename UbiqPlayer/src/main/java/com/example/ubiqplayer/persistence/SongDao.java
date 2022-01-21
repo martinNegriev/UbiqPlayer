@@ -57,7 +57,7 @@ public abstract class SongDao {
     public abstract List<Song> getSongs();
 
     @Transaction
-    @Query("SELECT * FROM Playlist")
+    @Query("SELECT * FROM Playlist ORDER BY playlistName ASC")
     public abstract List<PlaylistWithSongs> getPlaylistWithSongs();
 
     @Transaction

@@ -1,12 +1,14 @@
 package com.example.ubiqplayer.utils;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 
+import com.example.ubiqplayer.App;
 import com.example.ubiqplayer.R;
 
 import java.util.concurrent.Executor;
@@ -42,6 +44,10 @@ public class CommonUtils {
         boolean isLightTheme = ta.getBoolean(0, true);
         ta.recycle();
         return isLightTheme;
+    }
+
+    public static SharedPreferences getSharedPrefs(String name) {
+        return App.get().getSharedPreferences(name, Context.MODE_PRIVATE);
     }
 
 }

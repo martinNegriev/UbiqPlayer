@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.ubiqplayer.ui.models.Song;
 import com.example.ubiqplayer.ui.repositories.PlaylistWithSongsRepository;
+import com.example.ubiqplayer.ui.sorting.SortOption;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class PlaylistWithSongsViewModel extends AndroidViewModel {
         return songsData;
     }
 
-    public void loadSongsForPlaylist(String playlistName) {
-        songRepository.loadSongsForPlaylist(playlistName);
+    public void loadSongsForPlaylist(String playlistName, SortOption option, boolean reversed) {
+        songRepository.loadSongsForPlaylist(playlistName, option, reversed);
     }
 }
