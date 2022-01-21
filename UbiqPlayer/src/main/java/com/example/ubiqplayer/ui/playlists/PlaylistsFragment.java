@@ -1,5 +1,6 @@
 package com.example.ubiqplayer.ui.playlists;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,6 +29,7 @@ import com.example.ubiqplayer.persistence.Playlist;
 import com.example.ubiqplayer.persistence.PlaylistWithSongs;
 import com.example.ubiqplayer.persistence.SongDatabase;
 import com.example.ubiqplayer.ui.adapters.PlaylistsAdapter;
+import com.example.ubiqplayer.ui.helper.ResultTask;
 import com.example.ubiqplayer.ui.interfaces.IPlaylistClickListener;
 import com.example.ubiqplayer.ui.viewmodels.PlaylistViewModel;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -164,5 +166,24 @@ public class PlaylistsFragment extends BaseFragment implements IPlaylistClickLis
 
     public void reloadData() {
         playlistViewModel.loadPlaylistsData();
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    @Override
+    public void removePlaylist(@NonNull PlaylistWithSongs removed) {
+        new ResultTask<Integer>() {
+
+            @Override
+            protected Integer doInBackground() {
+                return SongDatabase.getInstance().songDao().deletePlaylist(removed.playlist);
+            }
+
+            @Override
+            protected void onPostExecute(Integer integer) {
+                if (integer <= 0)
+                    return;
+                playlistViewModel.loadPlaylistsData();
+            }
+        }.start();
     }
 }

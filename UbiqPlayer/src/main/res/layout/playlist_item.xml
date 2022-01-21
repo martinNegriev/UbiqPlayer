@@ -25,6 +25,7 @@
         android:layout_centerVertical="true"
         android:layout_marginStart="16dp"
         android:layout_toEndOf="@id/playlist_thumbnail"
+        android:layout_toStartOf="@id/remove_playlist_button"
         android:orientation="vertical">
 
         <TextView
@@ -48,6 +49,16 @@
             android:textSize="12sp"/>
 
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/remove_playlist_button"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginLeft="8dp"
+        app:srcCompat="@drawable/ic_remove"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"/>
 
 
 </RelativeLayout>

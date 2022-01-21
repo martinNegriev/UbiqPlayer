@@ -1,6 +1,7 @@
 package com.example.ubiqplayer.ui.viewholders;
 
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -16,6 +17,7 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements View.
     public TextView playlistTitleView;
     public TextView playlistNumItems;
     public PlaylistWithSongs playlist;
+    public ImageView removePlaylistButton;
 
     public PlaylistViewHolder(@NonNull View itemView, IPlaylistClickListener playlistClickListener) {
         super(itemView);
@@ -23,6 +25,7 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements View.
         this.playlistClickListener = playlistClickListener;
         playlistTitleView = itemView.findViewById(R.id.playlist_title);
         playlistNumItems = itemView.findViewById(R.id.number_of_songs);
+        removePlaylistButton = itemView.findViewById(R.id.remove_playlist_button);
     }
 
     @Override

@@ -41,6 +41,7 @@ public class PlaylistsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         playlistViewHolder.playlist = playlist;
         playlistViewHolder.playlistTitleView.setText(playlist.playlist.playlistName);
         playlistViewHolder.playlistNumItems.setText(App.get().getResources().getQuantityString(R.plurals.songs_in_playlist_num, playlist.songs.size(), playlist.songs.size()));
+        playlistViewHolder.removePlaylistButton.setOnClickListener(v -> playlistClickListener.removePlaylist(playlist));
     }
 
     @Override

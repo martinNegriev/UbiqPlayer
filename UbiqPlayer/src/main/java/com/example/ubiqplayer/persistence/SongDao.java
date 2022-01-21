@@ -18,6 +18,41 @@ import java.util.List;
 @Dao
 public abstract class SongDao {
 
+    //////////////////////// INSERT
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    public abstract void insertPlaylistSongCrossRef(List<PlaylistSongCrossRef> playlistAndSong);
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    public abstract List<Long> insertSongs(List<Song> songs);
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    public abstract void insertPlaylists(List<Playlist> newPlayLists);
+
+
+    //////////////////////// UPDATE
+
+    @Update
+    public abstract void update(List<Song> songs);
+
+    @Update
+    public abstract void update(Song song);
+
+    @Query("UPDATE song SET favorite = :state WHERE songUri = :songUri")
+    public abstract int toggleFavorite(int state, Uri songUri);
+
+
+    //////////////////////// DELETE
+
+    @Delete
+    public abstract int deleteSongFromPlaylist(PlaylistSongCrossRef crossRef);
+
+    @Delete
+    public abstract int deletePlaylist(Playlist playlist);
+
+
+    //////////////////////// CUSTOM QUERIES
+
     @Query("SELECT * FROM Song")
     public abstract List<Song> getSongs();
 
@@ -38,24 +73,6 @@ public abstract class SongDao {
     @Query("SELECT * FROM playlist WHERE playlistName = :playlistName")
     public abstract Playlist getPlaylistByName(String playlistName);
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public abstract void insertPlaylistSongCrossRef(List<PlaylistSongCrossRef> playlistAndSong);
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    public abstract List<Long> insertSongs(List<Song> songs);
-
-    @Update
-    public abstract void update(List<Song> songs);
-
-    @Update
-    public abstract void update(Song song);
-
-    @Query("UPDATE song SET favorite = :state WHERE songUri = :songUri")
-    public abstract int toggleFavorite(int state, Uri songUri);
-
-    @Delete
-    public abstract int deleteSongFromPlaylist(PlaylistSongCrossRef crossRef);
-
     @Transaction
     public void upsert(List<Song> songs) {
         List<Long> insertResult = insertSongs(songs);
@@ -70,7 +87,4 @@ public abstract class SongDao {
             update(updateList);
         }
     }
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    public abstract void insertPlaylists(List<Playlist> newPlayLists);
 }

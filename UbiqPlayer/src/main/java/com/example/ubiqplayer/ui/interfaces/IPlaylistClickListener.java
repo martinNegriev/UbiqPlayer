@@ -8,4 +8,6 @@ public interface IPlaylistClickListener {
 
     void onClick(@NonNull PlaylistWithSongs clicked);
 
+    void removePlaylist(@NonNull PlaylistWithSongs removed);
+
 }
