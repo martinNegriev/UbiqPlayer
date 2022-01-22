@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -24,9 +25,10 @@ public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnCl
     public TextView artistView;
     public TextView durationView;
     public Song song;
-    private ISongClickListener songClickListener;
+    @Nullable
+    private final ISongClickListener songClickListener;
 
-    public SongViewHolder(@NonNull View itemView, ISongClickListener songClickListener) {
+    public SongViewHolder(@NonNull View itemView, @Nullable ISongClickListener songClickListener) {
         super(itemView);
         itemView.setOnClickListener(this);
         thumbnailView = itemView.findViewById(R.id.song_thumbnail);
@@ -63,6 +65,7 @@ public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnCl
 
     @Override
     public void onClick(View v) {
-        songClickListener.onClick(song);
+        if (songClickListener != null)
+            songClickListener.onClick(song);
     }
 }

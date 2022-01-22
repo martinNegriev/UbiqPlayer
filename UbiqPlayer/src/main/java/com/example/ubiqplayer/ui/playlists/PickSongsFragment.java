@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ubiqplayer.App;
 import com.example.ubiqplayer.R;
+import com.example.ubiqplayer.mediaplayer.MediaPlayerService;
 import com.example.ubiqplayer.persistence.PlaylistSongCrossRef;
 import com.example.ubiqplayer.persistence.PlaylistWithSongs;
 import com.example.ubiqplayer.persistence.SongDatabase;
@@ -24,6 +25,7 @@ import com.example.ubiqplayer.ui.adapters.HomeAdapter;
 import com.example.ubiqplayer.ui.interfaces.ISongAddedListener;
 import com.example.ubiqplayer.ui.interfaces.ISongClickListener;
 import com.example.ubiqplayer.ui.models.Song;
+import com.example.ubiqplayer.ui.queue.QueueFragment;
 import com.example.ubiqplayer.ui.viewmodels.HomeViewModel;
 import com.example.ubiqplayer.utils.CommonUtils;
 
@@ -78,7 +80,8 @@ public class PickSongsFragment extends DialogFragment implements ISongClickListe
     public void onResume() {
         super.onResume();
         String playlistName = getArguments().getString(PlaylistsFragment.PLAYLIST_NAME_EXTRA, "");
-        if (TextUtils.isEmpty(playlistName))
+        boolean isQueue = getArguments().getBoolean(QueueFragment.QUEUE_EXTRA, false);
+        if (TextUtils.isEmpty(playlistName) && !isQueue)
             return;
         songViewModel.loadSongsData();
     }
@@ -91,8 +94,16 @@ public class PickSongsFragment extends DialogFragment implements ISongClickListe
     @Override
     public void onClick(@NonNull Song clickedSong) {
         CommonUtils.UNBOUNDED_EXECUTOR.execute(() -> {
-            if (TextUtils.isEmpty(playlistName))
+            if (TextUtils.isEmpty(playlistName)) {
+                boolean isQueue = getArguments().getBoolean(QueueFragment.QUEUE_EXTRA, false);
+                if (!isQueue)
+                    return;
+                App.HANDLER.post(() -> {
+                    MediaPlayerService.addMediaItem(clickedSong);
+                    songAddedListener.onSongAdded();
+                });
                 return;
+            }
             PlaylistWithSongs playlistWithSongs = SongDatabase.getInstance().songDao().getPlaylistWithSongsByName(playlistName);
             List<Song> songs = playlistWithSongs.songs;
             for (Song s : songs) {

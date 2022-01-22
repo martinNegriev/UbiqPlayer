@@ -18,6 +18,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import android.util.TypedValue;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -394,5 +395,49 @@ public class MediaPlayerService extends LifecycleService {
     @Nullable
     public static Map<Uri, List<String>> getCurrentSongLyricsList() {
         return currentSongLyricsList;
+    }
+
+    public static List<Song> getSongsQueue() {
+        return songsQueue;
+    }
+
+    public static void setSongsQueue(@Nullable List<Song> songsQueue) {
+        MediaPlayerService.songsQueue = songsQueue;
+    }
+
+    public static void moveMediaItem(int oldInd, int newInd) {
+        if (oldInd == newInd)
+            return;
+        playerCore.moveMediaItem(oldInd, newInd);
+        moveItem(oldInd, newInd, songsQueue);
+    }
+
+    public static void removeMediaItem(int pos) {
+        playNextPrev(true);
+        playerCore.removeMediaItem(pos);
+        songsQueue.remove(pos);
+        if (songsQueue.isEmpty())
+            killService();
+    }
+
+    public static void addMediaItem(Song clickedSong) {
+        if (songsQueue.contains(clickedSong)) {
+            Toast.makeText(App.get(), R.string.song_already_in_queue, Toast.LENGTH_LONG).show();
+            return;
+        }
+        playerCore.addMediaItem(MediaItem.fromUri(clickedSong.getSongUri()));
+        songsQueue.add(clickedSong);
+    }
+
+    public static void setCurrentSong(@Nullable Song song) {
+        currentSong = song;
+    }
+
+    private static void moveItem(int sourceIndex, int targetIndex, List<Song> list) {
+        if (sourceIndex <= targetIndex) {
+            Collections.rotate(list.subList(sourceIndex, targetIndex + 1), -1);
+        } else {
+            Collections.rotate(list.subList(targetIndex, sourceIndex + 1), 1);
+        }
     }
 }

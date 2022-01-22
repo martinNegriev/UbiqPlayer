@@ -56,6 +56,9 @@ public abstract class SongDao {
     @Query("SELECT * FROM Song")
     public abstract List<Song> getSongs();
 
+    @Query("SELECT * FROM Song WHERE songUri = :songUri")
+    public abstract Song getSongByUri(Uri songUri);
+
     @Transaction
     @Query("SELECT * FROM Playlist ORDER BY playlistName ASC")
     public abstract List<PlaylistWithSongs> getPlaylistWithSongs();

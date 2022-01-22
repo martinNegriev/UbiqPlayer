@@ -81,18 +81,10 @@ public class PlaylistWithSongsFragment extends BaseFragment implements ISongClic
         sortBy = sortLayout.findViewById(R.id.sorted_by);
         sortDirection = sortLayout.findViewById(R.id.sort_direction);
         sortLayout.setOnClickListener(v1 -> openSortDialog(SortLocation.PlaylistWithSong));
-        addSongsButton.setOnClickListener(v1 -> openPickSongsFragment());
-        addSongsLowerButton.setOnClickListener(v1 -> openPickSongsFragment());
+        addSongsButton.setOnClickListener(v1 -> openPickSongsFragment(this, playlistName, false));
+        addSongsLowerButton.setOnClickListener(v1 -> openPickSongsFragment(this, playlistName, false));
         initRecyclerView();
         return v;
-    }
-
-    private void openPickSongsFragment() {
-        DialogFragment frag = new PickSongsFragment(this);
-        Bundle b = new Bundle();
-        b.putString(PlaylistsFragment.PLAYLIST_NAME_EXTRA, playlistName);
-        frag.setArguments(b);
-        frag.show(getActivity().getSupportFragmentManager(), null);
     }
 
     @Override

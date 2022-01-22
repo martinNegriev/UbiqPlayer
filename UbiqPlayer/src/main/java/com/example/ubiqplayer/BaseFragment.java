@@ -1,15 +1,21 @@
 package com.example.ubiqplayer;
 
 import android.annotation.SuppressLint;
+import android.os.Bundle;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.RadioGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.ubiqplayer.ui.interfaces.ISongAddedListener;
+import com.example.ubiqplayer.ui.playlists.PickSongsFragment;
+import com.example.ubiqplayer.ui.playlists.PlaylistsFragment;
+import com.example.ubiqplayer.ui.queue.QueueFragment;
 import com.example.ubiqplayer.ui.sorting.SortDirection;
 import com.example.ubiqplayer.ui.sorting.SortExtras;
 import com.example.ubiqplayer.ui.sorting.SortLocation;
@@ -172,4 +178,15 @@ public abstract class BaseFragment extends Fragment {
     }
 
     protected void applySortAndLoad(){}
+
+    public void reloadIfNeeded() {}
+
+    protected void openPickSongsFragment(ISongAddedListener songAddedListener, String playlistName, boolean forQueue) {
+        DialogFragment frag = new PickSongsFragment(songAddedListener);
+        Bundle b = new Bundle();
+        b.putString(PlaylistsFragment.PLAYLIST_NAME_EXTRA, playlistName);
+        b.putBoolean(QueueFragment.QUEUE_EXTRA, forQueue);
+        frag.setArguments(b);
+        frag.show(getActivity().getSupportFragmentManager(), null);
+    }
 }

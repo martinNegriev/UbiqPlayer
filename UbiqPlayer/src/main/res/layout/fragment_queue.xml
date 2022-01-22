@@ -4,40 +4,58 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.favorites.FavoritesFragment">
+    tools:context=".ui.queue.QueueFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/favorites_recycler_view"
+    <LinearLayout
+        android:id="@+id/recycler_view_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/backgroundColor"
-        android:visibility="visible"/>
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/queue_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/backgroundColor"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/add_songs_lower_button"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/add_songs_button_text"
+            android:textColor="@android:color/white"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"/>
+
+    </LinearLayout>
 
     <RelativeLayout
-        android:id="@+id/no_favs_layout"
+        android:id="@+id/no_songs_in_queue_layout"
         android:layout_width="match_parent"
         android:gravity="center_vertical"
         android:visibility="gone"
         android:layout_height="match_parent">
 
         <ImageView
-            android:id="@+id/no_favs_icon"
+            android:id="@+id/no_songs_in_queue_icon"
             android:layout_width="match_parent"
             app:srcCompat="@drawable/ic_no_playlists"
             android:layout_height="160dp"
             android:layout_alignParentTop="true"/>
 
         <TextView
-            android:id="@+id/no_favs_message"
+            android:id="@+id/no_songs_in_queue_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="20dp"
             android:textAlignment="center"
             android:fontFamily="sans-serif-medium"
-            android:layout_below="@id/no_favs_icon"
+            android:layout_below="@id/no_songs_in_queue_icon"
             android:textSize="28sp"
-            android:text="@string/no_favorites_msg"
+            android:text="@string/no_songs_in_queue_msg"
             android:textColor="@color/textColor"/>
 
     </RelativeLayout>

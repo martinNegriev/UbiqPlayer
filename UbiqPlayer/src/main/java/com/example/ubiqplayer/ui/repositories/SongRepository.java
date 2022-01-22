@@ -13,7 +13,7 @@ import java.util.List;
 public class SongRepository implements ISongRepository {
 
     private static SongRepository instance;
-    private MutableLiveData<List<Song>> songsData = new MutableLiveData<>();
+    private final MutableLiveData<List<Song>> songsData = new MutableLiveData<>();
 
     public static SongRepository getInstance() {
         if (instance == null) {

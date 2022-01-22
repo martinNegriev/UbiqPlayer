@@ -61,6 +61,13 @@ class UbiqPlayerLogic(val act: UbiqPlayerActivity) {
                     act.musicBottomSheet.hideBottomSheet()
                     act.musicBottomSheet.hideLyricsView()
                     MediaPlayerService.setCurrentSongLyricsList(null)
+                    MediaPlayerService.setCurrentSong(null)
+                    MediaPlayerService.setSongsQueue(null)
+                    val frag = getCurrentFragment()
+                    if (frag is BaseFragment) {
+                        frag.notifyAdapterDataSetChanged()
+                        frag.reloadIfNeeded()
+                    }
                 }
                 else -> assert(false)
             }

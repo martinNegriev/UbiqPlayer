@@ -15,11 +15,13 @@
     <string name="menu_playlists">Playlists</string>
     <string name="menu_favorites">Favorites</string>
     <string name="menu_settings">Settings</string>
+    <string name="menu_queue">Queue</string>
     <string name="change_theme">Change theme</string>
     <string name="ubiq_player_channel_str">Ubiq Player</string>
     <string name="toast_msg_no_lyrics_found">No lyrics found</string>
     <string name="no_playlists_msg">No playlists found</string>
     <string name="no_favorites_msg">No favorites found</string>
+    <string name="no_songs_in_queue_msg">No songs in queue</string>
     <plurals name="songs_in_playlist_num">
         <item quantity="one">%1$d song</item>
         <item quantity="other">%1$d songs</item>
@@ -43,4 +45,5 @@
     <string name="sort_by_asc">Ascending</string>
     <string name="sort_by_desc">Descending</string>
     <string name="sort_options">Sort options</string>
+    <string name="song_already_in_queue">Song is already in queue</string>
 </resources>

@@ -15,7 +15,7 @@ import java.util.List;
 public class HomeViewModel extends AndroidViewModel {
 
     private MutableLiveData<List<Song>> songsData;
-    private final SongRepository songRepository = SongRepository.getInstance();
+    protected final SongRepository songRepository = SongRepository.getInstance();
 
     public HomeViewModel(Application application) {
         super(application);

@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ubiqplayer.R;
@@ -27,6 +28,7 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private Context context;
     private List<Song> songs = new ArrayList<>();
+    @Nullable
     protected ISongClickListener songClickListener;
     private static final LruCache<String, Bitmap> memoryCache;
 
@@ -40,7 +42,7 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         };
     }
 
-    public HomeAdapter(Context context, ISongClickListener songClickListener) {
+    public HomeAdapter(Context context, @Nullable ISongClickListener songClickListener) {
         this.context = context;
         this.songClickListener = songClickListener;
         setHasStableIds(true);
@@ -63,7 +65,8 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         songHolder.titleView.setText(correspondingSong.getTitle());
         songHolder.durationView.setText(SongUtils.getFormattedDuration(correspondingSong.getDuration()));
         songHolder.song = correspondingSong;
-        if (MediaPlayerService.getState() != Player.STATE_IDLE && correspondingSong.getSongUri().equals(MediaPlayerService.getCurrentSong().getSongUri())) {
+        Song currentSong = MediaPlayerService.getCurrentSong();
+        if (currentSong != null && MediaPlayerService.getState() != Player.STATE_IDLE && correspondingSong.getSongUri().equals(currentSong.getSongUri())) {
             songHolder.artistView.setTextColor(ctx.getResources().getColor(R.color.colorAccent, ctx.getTheme()));
             songHolder.titleView.setTextColor(ctx.getResources().getColor(R.color.colorAccent, ctx.getTheme()));
             songHolder.durationView.setTextColor(ctx.getResources().getColor(R.color.colorAccent, ctx.getTheme()));
