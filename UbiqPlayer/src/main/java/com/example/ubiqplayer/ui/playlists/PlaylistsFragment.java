@@ -98,7 +98,7 @@ public class PlaylistsFragment extends BaseFragment implements IPlaylistClickLis
 
     private void addPlaylist() {
         final EditText editText= new EditText(this.getContext());
-        AlertDialog dialog = new MaterialAlertDialogBuilder(this.getContext())
+        AlertDialog dialog = new MaterialAlertDialogBuilder(this.getContext(), R.style.MultiChoiceAlertDialog)
                 .setTitle(App.get().getResources().getString(R.string.new_playlist))
                 .setMessage(App.get().getResources().getString(R.string.enter_playlist_name))
                 .setView(editText)
@@ -119,6 +119,12 @@ public class PlaylistsFragment extends BaseFragment implements IPlaylistClickLis
                 .setNegativeButton(App.get().getResources().getString(R.string.cancel_button), null)
                 .create();
         dialog.show();
+        if (editText.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
+            ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) editText.getLayoutParams();
+            p.setMargins(CommonUtils.dpToPx(20), p.topMargin, CommonUtils.dpToPx(20), p.bottomMargin);
+            editText.setLayoutParams(p);
+            editText.requestLayout();
+        }
     }
 
     private void initRecyclerView() {
