@@ -156,7 +156,10 @@ public abstract class BaseFragment extends Fragment {
 
     private void checkPrefs(@Nullable SortOption option, @Nullable SortDirection direction, SortRadioButton radioButton, @NonNull String extraSort, @NonNull String extraDirection) {
         if (option != null) {
-            if (option.name().equals(CommonUtils.getSharedPrefs(SortExtras.SORT_PREFS_NAME).getString(extraSort, SortOption.Name.name())))
+            SortOption defaultSortOption = SortOption.Title;
+            if (extraSort.equals(SortExtras.SORT_EXTRA_PLAYLISTS))
+                defaultSortOption = SortOption.Name;
+            if (option.name().equals(CommonUtils.getSharedPrefs(SortExtras.SORT_PREFS_NAME).getString(extraSort, defaultSortOption.name())))
                 radioButton.setChecked(true);
         }
         if (direction != null) {

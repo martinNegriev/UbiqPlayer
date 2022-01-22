@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.ubiqplayer.persistence.PlaylistWithSongs;
 import com.example.ubiqplayer.persistence.SongDatabase;
+import com.example.ubiqplayer.ui.interfaces.ISongRepository;
 import com.example.ubiqplayer.ui.models.Song;
 import com.example.ubiqplayer.ui.sorting.Comparators;
 import com.example.ubiqplayer.ui.sorting.SortOption;
@@ -13,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class PlaylistWithSongsRepository {
+public class PlaylistWithSongsRepository implements ISongRepository {
 
     private static PlaylistWithSongsRepository instance;
     private MutableLiveData<List<Song>> songsData = new MutableLiveData<>();
@@ -42,18 +43,7 @@ public class PlaylistWithSongsRepository {
                 return;
             }
             List<Song> playlistSongs = playlistWithSongs.songs;
-
-            if (sortOption == SortOption.Artist)
-                playlistSongs.sort(new Comparators.ArtistComparator());
-            else if (sortOption == SortOption.Title)
-                playlistSongs.sort(new Comparators.TitleComparator());
-            else if (sortOption == SortOption.Duration)
-                playlistSongs.sort(new Comparators.DurationComparator());
-
-            if (reversed)
-                Collections.reverse(playlistSongs);
-
-            songsData.postValue(playlistSongs);
+            sortAndPostSongs(sortOption, playlistSongs, songsData, reversed);
         });
     }
 }

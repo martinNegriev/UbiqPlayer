@@ -184,7 +184,7 @@ public class PlaylistWithSongsFragment extends BaseFragment implements ISongClic
 
     @Override
     protected void applySortAndLoad() {
-        SortOption option = SortOption.getByName(CommonUtils.getSharedPrefs(SortExtras.SORT_PREFS_NAME).getString(SortExtras.SORT_EXTRA_PLAYLISTS_WITH_SONGS, SortOption.Name.name()));
+        SortOption option = SortOption.getByName(CommonUtils.getSharedPrefs(SortExtras.SORT_PREFS_NAME).getString(SortExtras.SORT_EXTRA_PLAYLISTS_WITH_SONGS, SortOption.Title.name()));
         boolean reversed = CommonUtils.getSharedPrefs(SortExtras.SORT_PREFS_NAME).getBoolean(SortExtras.SORT_EXTRA_PLAYLISTS_WITH_SONGS_REVERSED, false);
         App.HANDLER.post(() -> {
             sortBy.setText(option.getName());
