@@ -95,6 +95,14 @@ public class MediaStoreUtil {
         return playlists;
     }
 
+    public static List<Song> queryMostPlayedSongs() {
+        List<Song> mostPlayedSongs = new ArrayList<>();
+        List<Song> cachedMostPlayedSongs = SongDatabase.getInstance().songDao().getMostPlayedSongs();
+        if (cachedMostPlayedSongs != null)
+            mostPlayedSongs.addAll(cachedMostPlayedSongs);
+        return mostPlayedSongs;
+    }
+
     private static void updatePartial(Map<Uri, Song> newSongs) {
         List<Song> cachedSongs = SongDatabase.getInstance().songDao().getSongs();
         if (cachedSongs == null)
@@ -102,7 +110,7 @@ public class MediaStoreUtil {
         for (Song cachedSong : cachedSongs) {
             Song newSong = newSongs.get(cachedSong.getSongUri());
             if (newSong != null) {
-                //TODO Add playlist stuff maaybe?
+                newSong.setTimesPlayed(cachedSong.getTimesPlayed());
                 newSong.setFavorite(cachedSong.isFavorite());
                 newSong.setLyrics(cachedSong.getLyrics());
             }

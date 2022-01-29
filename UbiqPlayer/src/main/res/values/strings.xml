@@ -3,6 +3,7 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="title_most_played">Most played</string>
     <string name="title_activity_ubiq_player">UbiqPlayerActivity</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -22,6 +23,7 @@
     <string name="no_playlists_msg">No playlists found</string>
     <string name="no_favorites_msg">No favorites found</string>
     <string name="no_songs_in_queue_msg">No songs in queue</string>
+    <string name="no_songs_played_msg">No songs played</string>
     <plurals name="songs_in_playlist_num">
         <item quantity="one">%1$d song</item>
         <item quantity="other">%1$d songs</item>

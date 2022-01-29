@@ -100,8 +100,10 @@ public class MediaPlayerService extends LifecycleService {
             refreshUI(true);
             if (index > -1 && songsQueue != null)
                 currentSong = songsQueue.get(index);
-            if (reason == ExoPlayer.MEDIA_ITEM_TRANSITION_REASON_REPEAT || reason == ExoPlayer.MEDIA_ITEM_TRANSITION_REASON_AUTO || reason == ExoPlayer.MEDIA_ITEM_TRANSITION_REASON_SEEK)
+            if (reason == ExoPlayer.MEDIA_ITEM_TRANSITION_REASON_REPEAT || reason == ExoPlayer.MEDIA_ITEM_TRANSITION_REASON_AUTO || reason == ExoPlayer.MEDIA_ITEM_TRANSITION_REASON_SEEK) {
                 updateNotification(true, currentSong);
+                updateMostPlayed(currentSong);
+            }
         }
 
         @Override
@@ -439,5 +441,15 @@ public class MediaPlayerService extends LifecycleService {
         } else {
             Collections.rotate(list.subList(targetIndex, sourceIndex + 1), 1);
         }
+    }
+
+
+    private static void updateMostPlayed(Song currentSong) {
+        if (currentSong == null)
+            return;
+        String action = MediaPlayerActions.ACTION_UPDATE_MOST_PLAYED;
+        Intent intent = new Intent(action);
+        intent.putExtra(MediaPlayerActions.EXTRA_SONG_URI, currentSong.getSongUri());
+        LocalBroadcastManager.getInstance(App.get()).sendBroadcast(intent);
     }
 }

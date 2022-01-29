@@ -29,5 +29,11 @@ class MediaPlayerActions {
 
         @JvmField
         val ACTION_REFRESH_UI_ITEM_TRANSITION = "REFRESH_UI_ITEM_TRANSITION"
+
+        @JvmField
+        val ACTION_UPDATE_MOST_PLAYED = "UPDATE_MOST_PLAYED"
+
+        @JvmField
+        val EXTRA_SONG_URI = "EXTRA_SONG_URI"
     }
 }

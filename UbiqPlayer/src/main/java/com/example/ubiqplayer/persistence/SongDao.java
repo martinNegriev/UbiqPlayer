@@ -41,6 +41,8 @@ public abstract class SongDao {
     @Query("UPDATE song SET favorite = :state WHERE songUri = :songUri")
     public abstract int toggleFavorite(int state, Uri songUri);
 
+    @Query("UPDATE song SET timesPlayed = timesPlayed + 1 WHERE songUri = :songUri")
+    public abstract int updateTimesPlayed(Uri songUri);
 
     //////////////////////// DELETE
 
@@ -51,7 +53,7 @@ public abstract class SongDao {
     public abstract int deletePlaylist(Playlist playlist);
 
 
-    //////////////////////// CUSTOM QUERIES
+    //////////////////////// SELECT CUSTOM QUERIES
 
     @Query("SELECT * FROM Song")
     public abstract List<Song> getSongs();
@@ -75,6 +77,9 @@ public abstract class SongDao {
 
     @Query("SELECT * FROM playlist WHERE playlistName = :playlistName")
     public abstract Playlist getPlaylistByName(String playlistName);
+
+    @Query("SELECT * FROM Song WHERE timesPlayed ORDER BY timesPlayed DESC")
+    public abstract List<Song> getMostPlayedSongs();
 
     @Transaction
     public void upsert(List<Song> songs) {
