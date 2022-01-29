@@ -122,7 +122,7 @@ public class UbiqPlayerActivity extends AppCompatActivity {
         if (musicBottomSheet == null) {
             LinearLayout bottomSheet = binding.appBarUbiqPlayer.musicBottomSheet.bottomSheetContent;
             BottomSheetBehavior<LinearLayout> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
-            musicBottomSheet = new MusicBottomSheet(bottomSheet, bottomSheetBehavior);
+            musicBottomSheet = new MusicBottomSheet(bottomSheet, bottomSheetBehavior, this);
         }
         return musicBottomSheet;
     }

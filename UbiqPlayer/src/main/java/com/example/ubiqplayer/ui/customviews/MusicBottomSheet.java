@@ -3,13 +3,16 @@ package com.example.ubiqplayer.ui.customviews;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
 import android.view.GestureDetector;
@@ -50,6 +53,7 @@ public class MusicBottomSheet {
     private View bottomSheet;
     private BottomSheetBehavior<LinearLayout> bottomSheetBehavior;
     private boolean isDragging;
+    private final Activity act;
     @Nullable
     private Song playingSong;
 
@@ -62,10 +66,11 @@ public class MusicBottomSheet {
     private final static Drawable PAUSE_DRAWABLE = AppCompatDrawableManager.get().getDrawable(App.get(),  R.drawable.ic_pause);
 
 
-    public MusicBottomSheet(View bottomSheet, BottomSheetBehavior<LinearLayout> bottomSheetBehavior) {
+    public MusicBottomSheet(View bottomSheet, BottomSheetBehavior<LinearLayout> bottomSheetBehavior, Activity act) {
         this.bottomSheet = bottomSheet;
         this.bottomSheetBehavior = bottomSheetBehavior;
         this.binding = MusicBottomSheetLayoutBinding.bind(bottomSheet);
+        this.act = act;
         binding.playerSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -217,43 +222,44 @@ public class MusicBottomSheet {
             );
         });
 
-        binding.playerSaveLyricsButton.setOnClickListener(v -> {
-            new Thread(() -> {
-                Song currentSong = MediaPlayerService.getCurrentSong();
-                String lyrics = SongDatabase.getInstance().songDao().getLyrics(currentSong.getSongUri());
-                if (!TextUtils.isEmpty(lyrics)) {
-                    currentSong.setLyrics(null);
-                    App.HANDLER.post(() -> binding.playerLyricsButton.callOnClick());
-                } else
-                    MediaPlayerService.setCurrentSongLyricsList(Collections.singletonList(lyrics));
-                SongDatabase.getInstance().songDao().update(currentSong);
-                initLyricsMode();
-            }).start();
-        });
+        binding.playerSaveLyricsButton.setOnClickListener(v -> new Thread(() -> {
+            Song currentSong = MediaPlayerService.getCurrentSong();
+            String lyrics = SongDatabase.getInstance().songDao().getLyrics(currentSong.getSongUri());
+            if (!TextUtils.isEmpty(lyrics)) {
+                currentSong.setLyrics(null);
+                App.HANDLER.post(() -> binding.playerLyricsButton.callOnClick());
+            } else
+                MediaPlayerService.setCurrentSongLyricsList(Collections.singletonList(lyrics));
+            SongDatabase.getInstance().songDao().update(currentSong);
+            initLyricsMode();
+        }).start());
 
         initFavsMode(null);
-        binding.playerFavsButton.setOnClickListener(v -> {
-            new ResultTask<Long>() {
-                Boolean isFav = null;
-                @Override
-                protected Long doInBackground() {
-                    Song currentSong = MediaPlayerService.getCurrentSong();
-                    int state = currentSong.isFavorite() ? 0 : 1;
-                    long res = SongDatabase.getInstance().songDao().toggleFavorite(state, currentSong.getSongUri());
-                    if (res > 0) {
-                        isFav = state == 1;
-                        currentSong.setFavorite(isFav);
-                    }
-                    return res;
+        binding.playerFavsButton.setOnClickListener(v -> new ResultTask<Long>() {
+            Boolean isFav = null;
+            @Override
+            protected Long doInBackground() {
+                Song currentSong = MediaPlayerService.getCurrentSong();
+                int state = currentSong.isFavorite() ? 0 : 1;
+                long res = SongDatabase.getInstance().songDao().toggleFavorite(state, currentSong.getSongUri());
+                if (res > 0) {
+                    isFav = state == 1;
+                    currentSong.setFavorite(isFav);
                 }
+                return res;
+            }
 
-                @Override
-                protected void onPostExecute(Long updated) {
-                    if (updated <= 0)
-                        return;
-                    initFavsMode(isFav);
-                    }
-            }.start();
+            @Override
+            protected void onPostExecute(Long updated) {
+                if (updated <= 0)
+                    return;
+                initFavsMode(isFav);
+                }
+        }.start());
+
+        binding.playerRingtoneButton.setOnClickListener(v -> {
+            Intent intent=new Intent(Settings.ACTION_SOUND_SETTINGS);
+            act.startActivity(intent);
         });
     }
 
