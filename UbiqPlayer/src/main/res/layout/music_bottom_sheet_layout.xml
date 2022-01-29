@@ -46,6 +46,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             app:srcCompat="@drawable/ic_heart"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:layout_alignParentStart="true"/>
 
         <ImageView
@@ -53,6 +54,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             app:srcCompat="@drawable/ic_save"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:visibility="invisible"
             android:layout_alignParentEnd="true"/>
 
@@ -97,7 +99,7 @@
             android:layout_height="20dp"
             android:layout_below="@id/player_artist"
             android:layout_marginTop="12dp"
-            android:max="1000"></SeekBar>
+            android:max="1000" />
 
         <TextView
             android:id="@+id/player_current_pos"
@@ -130,6 +132,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             app:srcCompat="@drawable/ic_lyrics"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"/>
 
@@ -154,6 +157,7 @@
                 android:layout_weight="1"
                 android:padding="8dp"
                 app:srcCompat="@drawable/ic_shuffle"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:layout_height="40dp">
             </ImageView>
 
@@ -163,6 +167,7 @@
                 android:layout_weight="1"
                 android:padding="8dp"
                 app:srcCompat="@drawable/ic_prev"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:layout_height="40dp">
             </ImageView>
 
@@ -172,6 +177,7 @@
                 android:layout_weight="1"
                 android:padding="8dp"
                 app:srcCompat="@drawable/ic_play"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:layout_height="40dp">
             </ImageView>
 
@@ -181,6 +187,7 @@
                 android:layout_weight="1"
                 android:padding="8dp"
                 app:srcCompat="@drawable/ic_next"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:layout_height="40dp">
             </ImageView>
 
@@ -204,6 +211,7 @@
                     android:layout_width="match_parent"
                     android:padding="8dp"
                     app:srcCompat="@drawable/ic_repeat"
+                    android:background="?attr/selectableItemBackgroundBorderless"
                     android:layout_height="match_parent">
                 </ImageView>
 
