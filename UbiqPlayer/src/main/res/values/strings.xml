@@ -48,4 +48,12 @@
     <string name="sort_by_desc">Descending</string>
     <string name="sort_options">Sort options</string>
     <string name="song_already_in_queue">Song is already in queue</string>
+    <string name="sleep_timer">Sleep timer</string>
+    <string name="invalid_input_msg">Invalid input</string>
+    <plurals name="minutes_remaining">
+        <item quantity="one">%1$d minute remaining</item>
+        <item quantity="other">%1$d minutes remaining</item>
+    </plurals>
+    <string name="set_sleep_timer_msg">Set sleep timer in minutes</string>
+    <string name="player_not_active_msg">Player not active. Please, play a song to set sleep timer.</string>
 </resources>

@@ -269,6 +269,7 @@ public class MediaPlayerService extends LifecycleService {
     }
 
     public static void killService() {
+        playerCore.stop();
         if (instance != null) {
             instance.stopForeground(true);
             instance.stopSelf();
