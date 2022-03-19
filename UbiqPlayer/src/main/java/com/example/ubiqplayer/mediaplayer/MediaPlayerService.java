@@ -416,7 +416,8 @@ public class MediaPlayerService extends LifecycleService {
     }
 
     public static void removeMediaItem(int pos) {
-        playNextPrev(true);
+        if (pos == playerCore.getCurrentMediaItemIndex())
+            playNextPrev(true);
         playerCore.removeMediaItem(pos);
         songsQueue.remove(pos);
         if (songsQueue.isEmpty())
