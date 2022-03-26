@@ -14,9 +14,9 @@ object LyricsFinder {
 
     const val MIN_LENGTH_LYRICS = 100
 
-    fun find (title: String): List<String> = google("$title lyrics")
+    fun find (title: String): List<String> = bingSearch("$title lyrics")
 
-    private fun google(query: String): List<String> {
+    private fun bingSearch(query: String): List<String> {
         val uri = "https://www.bing.com/search?q=${query.encodeParams()}&go=Search&qs=ds&form=QBRE"
         val response = getHttpContent(uri)
         val doc = Jsoup.parse(response)

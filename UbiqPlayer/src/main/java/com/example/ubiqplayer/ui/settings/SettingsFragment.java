@@ -201,7 +201,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                             long minutesInput;
                             try {
                                 minutesInput = Long.parseLong(editTextInput) * 1000 * 60;
-                                countDownTimer = new CountDownTimer(minutesInput, 1000000) {
+                                countDownTimer = new CountDownTimer(minutesInput, 60000) {
 
                                     @Override
                                     public void onTick(long millisUntilFinished) {
