@@ -1,7 +1,13 @@
 package com.example.ubiqplayer;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -13,8 +19,10 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.splashscreen.SplashScreen;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -32,6 +40,7 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 public class UbiqPlayerActivity extends AppCompatActivity {
 
     private static final int PERMISSION_REQUEST_CODE = 1111;
+    private static final int PERMISSION_ALL_FILES_ACCESS = 2222;
 
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityUbiqPlayerBinding binding;
@@ -41,7 +50,7 @@ public class UbiqPlayerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        SplashScreen.Companion.installSplashScreen(this);
         if (needsPermissions())
             return;
 
@@ -96,7 +105,27 @@ public class UbiqPlayerActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("NewApi")
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != PERMISSION_ALL_FILES_ACCESS)
+            return;
+        if (Environment.isExternalStorageManager())
+            initComponents();
+        else
+            finish();
+    }
+
     private boolean needsPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (Environment.isExternalStorageManager())
+                return false;
+            Intent i = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+            i.setData(Uri.parse("package:"+App.get().getPackageName()));
+            startActivityForResult(i, PERMISSION_ALL_FILES_ACCESS);
+            return true;
+        }
         if (!hasReadPermissions() || !hasWritePermissions()) {
             ActivityCompat.requestPermissions(this, new String[]{WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
             return true;
