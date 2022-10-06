@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -15,6 +16,9 @@ import com.example.ubiqplayer.mediaplayer.MediaPlayerService;
 import com.example.ubiqplayer.mediaplayer.UbiqPlayerLogic;
 import com.example.ubiqplayer.ui.customviews.MusicBottomSheet;
 import com.example.ubiqplayer.ui.models.Song;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.navigation.NavigationView;
 
@@ -62,6 +66,11 @@ public class UbiqPlayerActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         setSupportActionBar(binding.appBarUbiqPlayer.toolbar);
+
+        MobileAds.initialize(this);
+        AdRequest request = new AdRequest.Builder().build();
+        AdView adView = findViewById(R.id.ad_view);
+        adView.loadAd(request);
 
         musicBottomSheet = getMusicBottomSheet();
 
